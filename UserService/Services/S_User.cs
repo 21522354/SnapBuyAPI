@@ -16,6 +16,7 @@ namespace UserService.Services
         Task<ResponseData<int>> Delete(Guid userId);
         Task<ResponseData<MRes_User>> UpdateImageAndName(MReq_UserNameImage request);
         Task<ResponseData<MRes_User>> UpdatePassword(MReq_UserPassword request);
+        Task<ResponseData<MRes_User>> Login(MReq_UserLogin request);
 
     }
     public class S_User : IS_User
@@ -85,13 +86,35 @@ namespace UserService.Services
             return res;
         }
 
+        public async Task<ResponseData<MRes_User>> Login(MReq_UserLogin request)
+        {
+            var res = new ResponseData<MRes_User>();
+            try
+            {
+                var existsUser = await _context.Users.FirstOrDefaultAsync(p => p.Email == request.Email && p.Password == request.Password);
+                if(existsUser == null)
+                {
+                    res.error.message = "Sai email hoặc mật khẩu";
+                }
+                res.data = _mapper.Map<MRes_User>(existsUser);
+                res.result = 1;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
         public async Task<ResponseData<MRes_User>> SignUp(MReq_User request)
         {
             var res = new ResponseData<MRes_User>();
             try
             {
                 var existsUser = await _context.Users.FirstOrDefaultAsync(p => p.UserName == request.UserName || p.Email == request.Email) == null;
-                if (existsUser)
+                if (!existsUser)
                 {
                     res.error.message = "Trùng email hoặc username";
                     return res;

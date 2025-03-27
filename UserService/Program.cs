@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using UserService.Mapper;
 using UserService.Services;
 
 namespace UserService
@@ -13,6 +14,7 @@ namespace UserService
 
             // Add services to the container.
 
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -21,6 +23,14 @@ namespace UserService
             {
                 options.UseInMemoryDatabase("InMem");
             });
+
+            builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
+            //
+
+            builder.Services.AddScoped<IS_User, S_User>();
+
+            //
 
             var app = builder.Build();
 

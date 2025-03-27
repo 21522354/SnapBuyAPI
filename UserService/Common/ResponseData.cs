@@ -1,4 +1,6 @@
-﻿namespace UserService.Common
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace UserService.Common
 {
     public class ResponseData<T>
     {
@@ -6,6 +8,11 @@
         {
             result = 0;
             error = new Error();
+        }
+        public ResponseData(int result, int code, string message)
+        {
+            this.result = result;
+            error = new Error(code, message);
         }
         public int result { get; set; }
         public T data { get; set; } 
