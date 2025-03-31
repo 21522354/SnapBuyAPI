@@ -34,7 +34,7 @@ namespace UserService.Controllers
             var res = await _s_User.LoginWithGoogle(request);
             return Ok(res);
         }
-        [HttpPost]
+        [HttpPost("signUp")]
         public async Task<IActionResult> Create(MReq_User request)
         {
             if (!ModelState.IsValid)
@@ -54,10 +54,10 @@ namespace UserService.Controllers
             var res = await _s_User.Delete(id);
             return Ok(res); 
         }
-        [HttpPut("nameAvatar")]
-        public async Task<IActionResult> UpdateImageAndName(MReq_UserNameImage request)
+        [HttpPut("nameAvatarAddress")]
+        public async Task<IActionResult> UpdateImageAndName(MReq_UserNameImageAddress request)
         {
-            var res = await _s_User.UpdateImageAndName(request);
+            var res = await _s_User.UpdateImageNameAddress(request);
             return Ok(res);
         }
         [HttpPut("password")]
