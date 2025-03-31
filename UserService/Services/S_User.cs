@@ -96,6 +96,7 @@ namespace UserService.Services
                 if(existsUser == null)
                 {
                     res.error.message = "Sai email hoặc mật khẩu";
+                    return res;
                 }
                 res.data = _mapper.Map<MRes_User>(existsUser);
                 res.result = 1;
