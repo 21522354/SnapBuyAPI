@@ -2,11 +2,11 @@
 
 namespace UserService.Models.Dtos.RequestModels
 {
-    public class MReq_UserLogin
+    public class MReq_UserLoginGoogle
     {
         [Required]
-        public string Email { get; set; }
+        public string GoogleId { get; set; }
         [Required]
-        public string Password { get; set; }        
+        public string Email { get; set; }       
     }
 }

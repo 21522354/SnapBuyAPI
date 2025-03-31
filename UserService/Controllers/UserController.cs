@@ -26,6 +26,14 @@ namespace UserService.Controllers
             var res = await _s_User.Login(request);
             return Ok(res);
         }
+        [HttpPost("loginWithGoogle")]
+        public async Task<IActionResult> LoginWithGG(MReq_UserLoginGoogle request)
+        {
+            if (!ModelState.IsValid)
+                return Ok(new ResponseData<MRes_User>(0, 400, DataAnnotationExtensionMethod.GetErrorMessage(ModelState)));
+            var res = await _s_User.LoginWithGoogle(request);
+            return Ok(res);
+        }
         [HttpPost]
         public async Task<IActionResult> Create(MReq_User request)
         {
