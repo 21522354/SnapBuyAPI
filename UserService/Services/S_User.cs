@@ -14,7 +14,7 @@ namespace UserService.Services
         Task<ResponseData<MRes_User>> GetById(Guid userId);
         Task<ResponseData<MRes_User>> SignUp(MReq_User request);
         Task<ResponseData<int>> Delete(Guid userId);
-        Task<ResponseData<MRes_User>> UpdateImageAndName(MReq_UserNameImage request);
+        Task<ResponseData<MRes_User>> UpdateImageNameAddress(MReq_UserNameImageAddress request);
         Task<ResponseData<MRes_User>> UpdatePassword(MReq_UserPassword request);
         Task<ResponseData<MRes_User>> Login(MReq_UserLogin request);
         Task<ResponseData<MRes_User>> LoginWithGoogle(MReq_UserLoginGoogle request);
@@ -187,21 +187,22 @@ namespace UserService.Services
             return res;
         }
 
-        public async Task<ResponseData<MRes_User>> UpdateImageAndName(MReq_UserNameImage request)
+        public async Task<ResponseData<MRes_User>> UpdateImageNameAddress(MReq_UserNameImageAddress request)
         {
             var res = new ResponseData<MRes_User>();
             try
             {
                 var data = await _context.Users.FindAsync(request.ID);
-                if(data == null)
+                if (data == null)
                 {
                     res.error.message = MessageErrorConstants.DO_NOT_FIND_DATA;
                     return res;
                 }
                 data.Name = request.Name;
                 data.ImageURL = request.ImageUrl;
+                data.Address = request.Address;
                 var save = await _context.SaveChangesAsync();
-                if(save == 0)
+                if (save == 0)
                 {
                     res.error.code = 400;
                     res.error.message = MessageErrorConstants.EXCEPTION_DO_NOT_UPDATE;

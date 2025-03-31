@@ -14,5 +14,6 @@ namespace UserService.Models.Entities
         public string Email { get; set; }
         public string Password { get; set; } = string.Empty;
         public string GoogleId { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
     }
 }
