@@ -12,6 +12,8 @@ namespace UserService.Mapper
             CreateMap<User, MRes_User>().ReverseMap();
             CreateMap<User, MReq_UserNameImage>();
             CreateMap<User, MReq_User>().ReverseMap();
+            CreateMap<UserAddresses, MReq_UserAddress>().ReverseMap();
+            CreateMap<UserAddresses, MRes_UserAddress>().ReverseMap();
         }
     }
 }
