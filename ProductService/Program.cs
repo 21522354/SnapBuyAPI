@@ -1,4 +1,6 @@
 
+using ProductService.Services;
+
 namespace ProductService
 {
     public class Program
@@ -13,6 +15,8 @@ namespace ProductService
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddScoped<IS_Category, S_Category>();
 
             var app = builder.Build();
 

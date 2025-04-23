@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+using ProductService.Models.Dtos.RequestModels;
+using ProductService.Models.Dtos.ResponseModels;
+using ProductService.Models.Entities;
 
 namespace ProductService.Mapper
 {
@@ -6,7 +9,8 @@ namespace ProductService.Mapper
     {
         public MappingProfile()
         {
-            
+            CreateMap<Category, MRes_Category>().ReverseMap();
+            CreateMap<Category, MReq_Category>().ReverseMap();
         }
     }
 }

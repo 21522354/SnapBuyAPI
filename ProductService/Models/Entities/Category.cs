@@ -6,7 +6,6 @@
         public string Name { get; set; }    
         public int ParentId { get; set; }   
         public Category Parent { get; set; }    
-        public string Slug { get; set; }
         public DateTime CreatedAt { get; set; } 
         public ICollection<Category> ChildCategories { get; set; }
         public ICollection<Product> Products { get; set; }  
