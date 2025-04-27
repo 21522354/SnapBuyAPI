@@ -17,6 +17,9 @@ namespace ProductService
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddScoped<IS_Category, S_Category>();
+            builder.Services.AddScoped<IS_Product, S_Product>();
+            builder.Services.AddScoped<IS_ProductImage, S_ProductImage>();
+            builder.Services.AddScoped<IS_ProductVariant, S_ProductVariant>();
 
             var app = builder.Build();
 
