@@ -19,6 +19,8 @@ namespace ProductService.Services
         Task<ResponseData<MRes_Product>> GetById(int id);
 
         Task<ResponseData<List<MRes_Product>>> GetList();
+
+        Task<ResponseData<List<MRes_Product>>> GetListBySellerId(Guid sellerId);
     }
     public class S_Product : IS_Product
     {
@@ -43,6 +45,7 @@ namespace ProductService.Services
                 data.BasePrice = request.BasePrice;
                 data.Status = request.Status;
                 data.CategoryId = request.CategoryId;
+                data.Quantity = request.Quantity;
                 data.CreatedAt = DateTime.Now;
 
                 _context.Products.Add(data);
@@ -85,6 +88,7 @@ namespace ProductService.Services
                 data.BasePrice = request.BasePrice;
                 data.Status = request.Status;
                 data.CategoryId = request.CategoryId;
+                data.Quantity = request.Quantity;
                 data.CreatedAt = DateTime.Now;
 
                 _context.Products.Add(data);
@@ -170,6 +174,24 @@ namespace ProductService.Services
             try
             {
                 var data = await _context.Products.AsNoTracking().ToListAsync();
+                res.result = 1;
+                res.data = _mapper.Map<List<MRes_Product>>(data);
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<List<MRes_Product>>> GetListBySellerId(Guid sellerId)
+        {
+            var res = new ResponseData<List<MRes_Product>>();
+            try
+            {
+                var data = await _context.Products.Where(x => x.SellerId == sellerId).AsNoTracking().ToListAsync();
                 res.result = 1;
                 res.data = _mapper.Map<List<MRes_Product>>(data);
             }

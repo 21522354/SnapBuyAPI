@@ -1,4 +1,6 @@
 
+using Microsoft.EntityFrameworkCore;
+using ProductService.Mapper;
 using ProductService.Services;
 
 namespace ProductService
@@ -15,6 +17,11 @@ namespace ProductService
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddDbContext<ProductDBContext>(options =>
+            {
+                options.UseInMemoryDatabase("InMem");
+            });
+            builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
             builder.Services.AddScoped<IS_Category, S_Category>();
             builder.Services.AddScoped<IS_Product, S_Product>();

@@ -49,7 +49,7 @@ namespace ProductService.Services
                 }
                 var getById = await GetById(data.Id);
                 res.result = 1;
-                res.error.code = 201;
+                res.data = _mapper.Map<MRes_Category>(data);
                 res.error.message = MessageErrorConstants.CREATE_SUCCESS;
             }
             catch (Exception ex)
@@ -80,7 +80,7 @@ namespace ProductService.Services
                 }
                 var getById = await GetById(data.Id);
                 res.result = 1;
-                res.error.code = 201;
+                res.data = _mapper.Map<MRes_Category>(data);
                 res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
             }
             catch (Exception ex)
@@ -153,7 +153,7 @@ namespace ProductService.Services
             try
             {
                 var data = await _context.Categories.AsNoTracking().ToListAsync();
-                res.data = _mapper.Map<List<MRes_Category>>(res);
+                res.data = _mapper.Map<List<MRes_Category>>(data);
                 res.result = 1;
             }
             catch (Exception ex)
