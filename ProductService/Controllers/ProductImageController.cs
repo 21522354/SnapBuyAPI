@@ -5,7 +5,7 @@ using ProductService.Services;
 
 namespace ProductService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/productImages")]
     [ApiController]
     public class ProductImageController : ControllerBase
     {
@@ -20,6 +20,13 @@ namespace ProductService.Controllers
         public async Task<IActionResult> Create(MReq_ProductImage request)
         {
             var res = await _s_ProductImage.Create(request);
+            return Ok(res);
+        }
+
+        [HttpPost("many")]
+        public async Task<IActionResult> CreateMany(MReq_ProductImageCreate request)
+        {
+            var res = await _s_ProductImage.CreateMany(request);
             return Ok(res);
         }
 
@@ -52,9 +59,9 @@ namespace ProductService.Controllers
         }
 
         [HttpGet("product/{id}")]
-        public async Task<IActionResult> GetListByProductId(int productId)
+        public async Task<IActionResult> GetListByProductId(int id)
         {
-            var res = await _s_ProductImage.GetListByProduct(productId);
+            var res = await _s_ProductImage.GetListByProduct(id);
             return Ok(res);
         }
 

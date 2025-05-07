@@ -8,12 +8,15 @@ using ProductService.Models.Dtos.ResponseModels;
 using ProductService.Models.Entities;
 using ProductService.Ultils;
 using System;
+using System.Collections.Generic;
 
 namespace ProductService.Services
 {
     public interface IS_ProductImage
     {
         Task<ResponseData<MRes_ProductImage>> Create(MReq_ProductImage request);
+
+        Task<ResponseData<List<MRes_ProductImage>>> CreateMany(MReq_ProductImageCreate request);
 
         Task<ResponseData<MRes_ProductImage>> Update(MReq_ProductImage request);
 
@@ -61,6 +64,41 @@ namespace ProductService.Services
                 var getById = await GetById(data.Id);
                 res.result = 1;
                 res.data = getById.data;
+                res.error.message = MessageErrorConstants.CREATE_SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<List<MRes_ProductImage>>> CreateMany(MReq_ProductImageCreate request)
+        {
+            var res = new ResponseData<List<MRes_ProductImage>>();
+            try
+            {
+                var listProductImg = request.Urls.Select(x => new ProductImage()
+                {
+                    Url = x,
+                    CreatedAt = DateTime.Now,
+                    ProductId = request.ProductId,
+                }).ToList();
+                listProductImg[0].IsThumbnail = true;
+
+                _context.ProductImages.AddRange(listProductImg);
+                var save = await _context.SaveChangesAsync();
+                if (save == 0)
+                {
+                    res.error.code = 400;
+                    res.error.message = MessageErrorConstants.EXCEPTION_DO_NOT_CREATE;
+                    return res;
+                }
+
+                res.result = 1;
+                res.data = _mapper.Map<List<MRes_ProductImage>>(listProductImg);
                 res.error.message = MessageErrorConstants.CREATE_SUCCESS;
             }
             catch (Exception ex)
@@ -204,5 +242,6 @@ namespace ProductService.Services
             }
             return res;
         }
+
     }
 }

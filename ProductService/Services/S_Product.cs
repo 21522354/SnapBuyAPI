@@ -38,6 +38,13 @@ namespace ProductService.Services
             var res = new ResponseData<MRes_Product>();
             try
             {
+                var existCategory = await _context.Categories.AnyAsync(x => x.Id == request.CategoryId);
+                if(!existCategory)
+                {
+                    res.error.message = "Không tồn tại category được chọn trong hệ thống";
+                    return res;
+                }
+
                 var data = new Product();
                 data.SellerId = request.SellerId;
                 data.Name = request.Name;
@@ -91,7 +98,7 @@ namespace ProductService.Services
                 data.Quantity = request.Quantity;
                 data.CreatedAt = DateTime.Now;
 
-                _context.Products.Add(data);
+                _context.Products.Update(data);
                 var save = await _context.SaveChangesAsync();
                 if (save == 0)
                 {
@@ -135,6 +142,7 @@ namespace ProductService.Services
                 }
                 res.result = 1;
                 res.data = save;
+                res.error.message = MessageErrorConstants.DELETE_SUCCESS;
             }
             catch (Exception ex)
             {

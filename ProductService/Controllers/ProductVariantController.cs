@@ -5,7 +5,7 @@ using ProductService.Services;
 
 namespace ProductService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/productVariants")]
     [ApiController]
     public class ProductVariantController : ControllerBase
     {
@@ -52,9 +52,9 @@ namespace ProductService.Controllers
         }
 
         [HttpGet("product/{id}")]
-        public async Task<IActionResult> GetListByProductId(int productId)
+        public async Task<IActionResult> GetListByProductId(int id)
         {
-            var res = await _s_ProductVariant.GetListByProduct(productId);
+            var res = await _s_ProductVariant.GetListByProduct(id);
             return Ok(res);
         }
     }

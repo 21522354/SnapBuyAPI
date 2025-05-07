@@ -46,6 +46,7 @@ namespace ProductService.Services
                 data.Color = request.Color;
                 data.Price = request.Price;
                 data.Status = request.Status;
+                data.CreatedAt = DateTime.Now;
 
                 _context.ProductVariants.Add(data);
                 var save = await _context.SaveChangesAsync();
@@ -83,7 +84,7 @@ namespace ProductService.Services
                 data.Price = request.Price;
                 data.Status = request.Status;
 
-                _context.ProductVariants.Add(data);
+                _context.ProductVariants.Update(data);
                 var save = await _context.SaveChangesAsync();
                 if (save == 0)
                 {
@@ -95,7 +96,7 @@ namespace ProductService.Services
                 var getById = await GetById(data.Id);
                 res.result = 1;
                 res.data = getById.data;
-                res.error.message = MessageErrorConstants.CREATE_SUCCESS;
+                res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
             }
             catch (Exception ex)
             {
