@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Azure.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 using ProductService.Common;
 using ProductService.Models.Dtos.RequestModels;
 using ProductService.Models.Dtos.ResponseModels;
@@ -128,13 +129,14 @@ namespace ProductService.Services
             var res = new ResponseData<MRes_Category>();
             try
             {
-                var data = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+                var data = await _context.Categories.Include(x => x.Products).AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
                 if(data == null)
                 {
                     res.error.message = MessageErrorConstants.DO_NOT_FIND_DATA;
                     return res;
                 }
                 var mapData = _mapper.Map<MRes_Category>(data);
+                mapData.NumberOfProduct = data.Products.Count;
                 res.data = mapData;
                 res.result = 1;
             }
@@ -152,8 +154,12 @@ namespace ProductService.Services
             var res = new ResponseData<List<MRes_Category>>();
             try
             {
-                var data = await _context.Categories.AsNoTracking().ToListAsync();
+                var data = await _context.Categories.Include(x => x.Products).AsNoTracking().ToListAsync();
                 res.data = _mapper.Map<List<MRes_Category>>(data);
+                for(int i = 0; i < data.Count; i++)
+                {
+                    res.data[i].NumberOfProduct = data[i].Products.Count;
+                }
                 res.result = 1;
             }
             catch (Exception ex)
