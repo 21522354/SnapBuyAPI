@@ -12,7 +12,9 @@ namespace ProductService.Services
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
-        public DbSet<ProductVariant> ProductVariants { get; set; }          
+        public DbSet<ProductVariant> ProductVariants { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<ProductTag> ProductTags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,6 +47,16 @@ namespace ProductService.Services
                 .HasMany(p => p.ProductImages)
                 .WithOne(p => p.Product)
                 .HasForeignKey(p => p.ProductId);
+
+            modelBuilder.Entity<ProductTag>()
+                .HasOne(p => p.Product)
+                .WithMany(p => p.ProductTags)
+                .HasForeignKey(p => p.ProductId);
+
+            modelBuilder.Entity<ProductTag>()
+                .HasOne(p => p.Tag)
+                .WithMany(p => p.ProductTags)
+                .HasForeignKey(p => p.TagId);
         }
     }
 }

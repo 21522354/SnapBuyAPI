@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using ProductService.Common;
 using ProductService.Models.Dtos.RequestModels;
 using ProductService.Models.Dtos.ResponseModels;
 using ProductService.Models.Entities;
 using ProductService.Ultils;
+using System.Linq.Expressions;
 
 namespace ProductService.Services
 {
@@ -158,14 +160,35 @@ namespace ProductService.Services
             var res = new ResponseData<MRes_Product>();
             try
             {
-                var data = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+                var data = await _context.Products
+                    .Include(x => x.ProductImages)
+                    .Include(x => x.ProductVariants)
+                    .Include(x => x.ProductTags)
+                    .ThenInclude(x => x.Tag)
+                    .AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
                 if(data == null)
                 {
                     res.error.message = MessageErrorConstants.DO_NOT_FIND_DATA;
                     return res;
                 }
+
+                var returnData = new MRes_Product();
+                returnData.Id = data.Id;
+                returnData.SellerId = data.SellerId;
+                returnData.Name = data.Name;
+                returnData.Description = data.Description;
+                returnData.BasePrice = data.BasePrice;
+                returnData.Status = data.Status;
+                returnData.CategoryId = data.CategoryId;
+                returnData.Quantity = data.Quantity;
+                returnData.CreatedAt = data.CreatedAt;
+                returnData.UpdatedAt = data.UpdatedAt;
+                returnData.ProductImages = _mapper.Map<List<MRes_ProductImage>>(data.ProductImages);
+                returnData.ProductVariants = _mapper.Map<List<MRes_ProductVariant>>(data.ProductVariants);
+                returnData.ListTag = data.ProductTags.Select(x => x.Tag.TagName).ToList();
+
                 res.result = 1;
-                res.data = _mapper.Map<MRes_Product>(data);
+                res.data = returnData;
             }
             catch (Exception ex)
             {
@@ -181,9 +204,32 @@ namespace ProductService.Services
             var res = new ResponseData<List<MRes_Product>>();
             try
             {
-                var data = await _context.Products.AsNoTracking().ToListAsync();
+                var data = await _context.Products
+                    .Include(x => x.ProductImages)
+                    .Include(x => x.ProductVariants)
+                    .Include(x => x.ProductTags)
+                    .ThenInclude(x => x.Tag)
+                    .AsNoTracking().ToListAsync();
+
+                var returnData = data.Select(x => new MRes_Product
+                {
+                    Id = x.Id,
+                    SellerId = x.SellerId,
+                    Name = x.Name,
+                    Description = x.Description,
+                    BasePrice = x.BasePrice,
+                    Status = x.Status,
+                    CategoryId = x.CategoryId,
+                    Quantity = x.Quantity,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    ProductImages = _mapper.Map<List<MRes_ProductImage>>(x.ProductImages),
+                    ProductVariants = _mapper.Map<List<MRes_ProductVariant>>(x.ProductVariants),
+                    ListTag = x.ProductTags.Select(x => x.Tag.TagName).ToList(),
+                }).ToList();
+
                 res.result = 1;
-                res.data = _mapper.Map<List<MRes_Product>>(data);
+                res.data = returnData;
             }
             catch (Exception ex)
             {
@@ -199,9 +245,33 @@ namespace ProductService.Services
             var res = new ResponseData<List<MRes_Product>>();
             try
             {
-                var data = await _context.Products.Where(x => x.SellerId == sellerId).AsNoTracking().ToListAsync();
+                var data = await _context.Products
+                    .Include(x => x.ProductImages)
+                    .Include(x => x.ProductVariants)
+                    .Include(x => x.ProductTags)
+                    .ThenInclude(x => x.Tag)
+                    .Where(x => x.SellerId == sellerId)
+                    .AsNoTracking().ToListAsync();
+
+                var returnData = data.Select(x => new MRes_Product
+                {
+                    Id = x.Id,
+                    SellerId = x.SellerId,
+                    Name = x.Name,
+                    Description = x.Description,
+                    BasePrice = x.BasePrice,
+                    Status = x.Status,
+                    CategoryId = x.CategoryId,
+                    Quantity = x.Quantity,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    ProductImages = _mapper.Map<List<MRes_ProductImage>>(x.ProductImages),
+                    ProductVariants = _mapper.Map<List<MRes_ProductVariant>>(x.ProductVariants),
+                    ListTag = x.ProductTags.Select(x => x.Tag.TagName).ToList(),
+                }).ToList();
+
                 res.result = 1;
-                res.data = _mapper.Map<List<MRes_Product>>(data);
+                res.data = returnData;
             }
             catch (Exception ex)
             {

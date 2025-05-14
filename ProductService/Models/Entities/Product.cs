@@ -14,6 +14,7 @@
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public ICollection<ProductVariant> ProductVariants { get; set; }
-        public ICollection<ProductImage> ProductImages { get; set; }    
+        public ICollection<ProductImage> ProductImages { get; set; }
+        public ICollection<ProductTag> ProductTags { get; set; }    
     }
 }

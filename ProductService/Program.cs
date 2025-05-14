@@ -27,8 +27,16 @@ namespace ProductService
             builder.Services.AddScoped<IS_Product, S_Product>();
             builder.Services.AddScoped<IS_ProductImage, S_ProductImage>();
             builder.Services.AddScoped<IS_ProductVariant, S_ProductVariant>();
+            builder.Services.AddScoped<IS_Tag, S_Tag>();
+            builder.Services.AddScoped<IS_ProductTag, S_ProductTag>();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                SeedData.SeedDatabase(services);
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

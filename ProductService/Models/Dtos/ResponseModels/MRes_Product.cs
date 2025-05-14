@@ -9,8 +9,11 @@
         public decimal BasePrice { get; set; }
         public int Status { get; set; }
         public int CategoryId { get; set; }
-        public int Quantity { get; set; }       
+        public int Quantity { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public ICollection<MRes_ProductImage> ProductImages { get; set; }
+        public ICollection<MRes_ProductVariant> ProductVariants { get; set; }
+        public ICollection<string> ListTag { get; set; }
     }
 }

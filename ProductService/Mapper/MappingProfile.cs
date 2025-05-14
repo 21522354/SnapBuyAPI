@@ -14,6 +14,8 @@ namespace ProductService.Mapper
             CreateMap<Product, MRes_Product>().ReverseMap();
             CreateMap<ProductImage, MRes_ProductImage>().ReverseMap();
             CreateMap<ProductVariant, MRes_ProductVariant>().ReverseMap();
+            CreateMap<Tag, MRes_Tag>().ReverseMap();
+            CreateMap<Tag, MReq_Tag>().ReverseMap();
         }
     }
 }
