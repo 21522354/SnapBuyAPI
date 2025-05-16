@@ -16,4 +16,10 @@
         public ICollection<MRes_ProductVariant> ProductVariants { get; set; }
         public ICollection<string> ListTag { get; set; }
     }
+
+    public class MRes_ProductRecommend
+    {
+        public int Id { get; set; }
+        public string ProductString { get; set; }       
+    }
 }

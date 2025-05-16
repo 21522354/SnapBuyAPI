@@ -25,6 +25,8 @@ namespace ProductService.Services
         Task<ResponseData<List<MRes_Product>>> GetListBySellerId(Guid sellerId);
 
         Task<ResponseData<List<MRes_Product>>> GetListByCategoryId(int categoryId);
+
+        Task<ResponseData<List<MRes_ProductRecommend>>> GetListProductStringForRecommend();
     }
     public class S_Product : IS_Product
     {
@@ -314,6 +316,51 @@ namespace ProductService.Services
                     ListTag = x.ProductTags.Select(x => x.Tag.TagName).ToList(),
                 }).ToList();
 
+                res.result = 1;
+                res.data = returnData;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<List<MRes_ProductRecommend>>> GetListProductStringForRecommend()
+        {
+            var res = new ResponseData<List<MRes_ProductRecommend>>();
+            try
+            {
+                var products = await _context.Products.Include(x => x.ProductTags).ThenInclude(x => x.Tag).AsNoTracking().ToListAsync();
+                var returnData = new List<MRes_ProductRecommend>();
+                foreach (var product in products)
+                {
+                    var tempString = "";
+                    tempString += product.Name;
+                    tempString += "_";
+                    tempString += product.BasePrice;
+                    tempString += "_";
+
+                    var productTags = product.ProductTags.Select(x => x.Tag.TagName).ToList();
+                    for (int i = 0; i < productTags.Count; i++)
+                    {
+                        tempString += productTags[i];
+                        if (i != productTags.Count - 1)
+                        {
+                            tempString += "_";
+                        }
+                    }
+
+                    var data = new MRes_ProductRecommend
+                    {
+                        Id = product.Id,
+                        ProductString = tempString
+                    };
+
+                    returnData.Add(data);
+                }
                 res.result = 1;
                 res.data = returnData;
             }

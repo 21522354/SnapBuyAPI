@@ -81,6 +81,13 @@ namespace UserService.Controllers
             return Ok(res);
         }
 
+        [HttpPut("lastProduct/{userId}/{productId}")]
+        public async Task<IActionResult> UpdateLastProduct(Guid userId, int productId)
+        {
+            var res = await _s_User.SetLastProduct(userId, productId);
+            return Ok(res);
+        }
+
         [HttpPost("address")]
         public async Task<IActionResult> CreateAddress(MReq_UserAddress request)
         {

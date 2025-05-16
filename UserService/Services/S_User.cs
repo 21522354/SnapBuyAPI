@@ -20,6 +20,7 @@ namespace UserService.Services
         Task<ResponseData<MRes_User>> UpdatePassword(MReq_UserPassword request);
         Task<ResponseData<int>> GoPremium(Guid userId);
         Task<ResponseData<int>> RemovePremium(Guid userId);
+        Task<ResponseData<int>> SetLastProduct(Guid userId, int productId);
         Task<ResponseData<MRes_User>> Login(MReq_UserLogin request);
         Task<ResponseData<MRes_User>> LoginWithGoogle(MReq_UserLoginGoogle request);
         Task<ResponseData<List<MRes_UserAddress>>> GetUserAddress(Guid userId);
@@ -408,6 +409,37 @@ namespace UserService.Services
                 var listUser = await _context.Users.ToListAsync();
                 res.result = 1;
                 res.data = _mapper.Map<List<MRes_User>>(listUser);
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<int>> SetLastProduct(Guid userId, int productId)
+        {
+            var res = new ResponseData<int>();
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if(user == null)
+                {
+                    res.error.message = MessageErrorConstants.DO_NOT_FIND_DATA;
+                    return res;
+                }
+                user.LastProductId = productId;
+                var save = await _context.SaveChangesAsync();
+                if(save == 0)
+                {
+                    res.error.code = 400;
+                    res.error.message = MessageErrorConstants.EXCEPTION_DO_NOT_UPDATE;
+                }
+                res.result = 1;
+                res.data = save;
+                res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
             }
             catch (Exception ex)
             {

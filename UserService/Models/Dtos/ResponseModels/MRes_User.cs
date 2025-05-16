@@ -9,5 +9,6 @@ namespace UserService.Models.Dtos.ResponseModels
         public string ImageURL { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
+        public int LastProductId { get; set; }
     }
 }

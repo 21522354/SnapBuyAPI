@@ -64,6 +64,13 @@ namespace ProductService.Controllers
             var res = await _s_Product.GetListByCategoryId(categoryId);
             return Ok(res);
         }
+
+        [HttpGet("recommend")]
+        public async Task<IActionResult> GetListProductStringForRecommend()
+        {
+            var res = await _s_Product.GetListProductStringForRecommend();
+            return Ok(res);
+        }
        
     }
 }
