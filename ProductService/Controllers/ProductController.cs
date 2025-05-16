@@ -57,5 +57,13 @@ namespace ProductService.Controllers
             var res = await _s_Product.GetListBySellerId(sellerId);
             return Ok(res);
         }
+
+        [HttpGet("category/{categoryId}")]
+        public async Task<IActionResult> GetListByCategoryId(int categoryId)
+        {
+            var res = await _s_Product.GetListByCategoryId(categoryId);
+            return Ok(res);
+        }
+       
     }
 }
