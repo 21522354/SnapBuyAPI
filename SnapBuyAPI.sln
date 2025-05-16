@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35825.156 d17.13
+VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService", "UserService\UserService.csproj", "{E0A48696-DE87-4DFE-8FFE-6CB7076CE3CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductService", "ProductService\ProductService.csproj", "{5FA437C1-E5A9-496A-9DE9-8AD8DCA3EF3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{E0A48696-DE87-4DFE-8FFE-6CB7076CE3CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0A48696-DE87-4DFE-8FFE-6CB7076CE3CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0A48696-DE87-4DFE-8FFE-6CB7076CE3CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FA437C1-E5A9-496A-9DE9-8AD8DCA3EF3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FA437C1-E5A9-496A-9DE9-8AD8DCA3EF3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FA437C1-E5A9-496A-9DE9-8AD8DCA3EF3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FA437C1-E5A9-496A-9DE9-8AD8DCA3EF3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
