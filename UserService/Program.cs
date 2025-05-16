@@ -34,6 +34,12 @@ namespace UserService
 
             var app = builder.Build();
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                SeedData.SeedDatabase(services);
+            }
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -44,7 +50,6 @@ namespace UserService
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

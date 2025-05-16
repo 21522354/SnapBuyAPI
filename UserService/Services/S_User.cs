@@ -12,7 +12,6 @@ namespace UserService.Services
 {
     public interface IS_User
     {
-        Task<ResponseData<MRes_User>> GetById(Guid userId);
         Task<ResponseData<MRes_User>> SignUp(MReq_User request);
         Task<ResponseData<MRes_UserAddress>> CreateAddress(MReq_UserAddress request);
         Task<ResponseData<MRes_UserAddress>> UpdateAddress(MReq_UserAddress request);
@@ -24,6 +23,8 @@ namespace UserService.Services
         Task<ResponseData<MRes_User>> Login(MReq_UserLogin request);
         Task<ResponseData<MRes_User>> LoginWithGoogle(MReq_UserLoginGoogle request);
         Task<ResponseData<List<MRes_UserAddress>>> GetUserAddress(Guid userId);
+        Task<ResponseData<MRes_User>> GetById(Guid userId);
+        Task<ResponseData<List<MRes_User>>> GetAll();
 
     }
     public class S_User : IS_User
@@ -399,5 +400,22 @@ namespace UserService.Services
             return res;
         }
 
+        public async Task<ResponseData<List<MRes_User>>> GetAll()
+        {
+            var res = new ResponseData<List<MRes_User>>();
+            try
+            {
+                var listUser = await _context.Users.ToListAsync();
+                res.result = 1;
+                res.data = _mapper.Map<List<MRes_User>>(listUser);
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
     }
 }

@@ -46,13 +46,6 @@ namespace UserService.Controllers
             return Ok(res); 
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
-        {
-            var res = await _s_User.GetById(id);
-            return Ok(res);
-        }
-
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -95,13 +88,6 @@ namespace UserService.Controllers
             return Ok(res);
         }
 
-        [HttpGet("address/{userId}")]
-        public async Task<IActionResult> GetUserAddresses(Guid userId)
-        {
-            var res = await _s_User.GetUserAddress(userId);
-            return Ok(res);
-        }
-
         [HttpPut("address")]
         public async Task<IActionResult> UpdateUserAddress(MReq_UserAddress request)
         {
@@ -109,5 +95,25 @@ namespace UserService.Controllers
             return Ok(res); 
         }
 
+        [HttpGet("address/{userId}")]
+        public async Task<IActionResult> GetUserAddresses(Guid userId)
+        {
+            var res = await _s_User.GetUserAddress(userId);
+            return Ok(res);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var res = await _s_User.GetById(id);
+            return Ok(res);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllUser()
+        {
+            var res = await _s_User.GetAll();
+            return Ok(res);
+        }
     }
 }
