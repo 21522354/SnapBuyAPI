@@ -1,4 +1,6 @@
 
+using StackExchange.Redis;
+
 namespace CartService
 {
     public class Program
@@ -13,6 +15,8 @@ namespace CartService
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+                ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]));
 
             var app = builder.Build();
 
