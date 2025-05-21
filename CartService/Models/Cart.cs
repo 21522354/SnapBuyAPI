@@ -2,8 +2,8 @@
 {
     public class Cart
     {
-        public int Id { get; set; }
+        public Guid UserId { get; set; }
         public List<CartItem> Items { get; set; }
-        public DateTime UpdatedAt { get; set; } 
+        public DateTime UpdatedAt { get; set; }
     }
 }

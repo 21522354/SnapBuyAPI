@@ -71,6 +71,12 @@ namespace ProductService.Controllers
             var res = await _s_Product.GetListProductStringForRecommend();
             return Ok(res);
         }
-       
+
+        [HttpGet("user")]
+        public async Task<IActionResult> GetUserById(Guid userId)
+        {
+            var res = await _s_Product.GetUser(userId);
+            return Ok(res);
+        }
     }
 }

@@ -10,8 +10,7 @@ namespace OrderService.Service
         }
 
         public DbSet<Order> Orders { get; set; }
-        public DbSet<SubOrder> SubOrders { get; set; }          
-        public DbSet<SubOrderItem> SubOrderItems { get; set; }
+        public DbSet<OrderItem> SubOrderItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -21,19 +20,11 @@ namespace OrderService.Service
                 .HasKey(x => x.Id);
 
             modelBuilder.Entity<Order>()
-                .HasMany(x => x.SubOrders)
+                .HasMany(x => x.OrderItems)
                 .WithOne(x => x.Order)
                 .HasForeignKey(x => x.OrderId);
 
-            modelBuilder.Entity<SubOrder>()
-                .HasKey(x => x.Id);
-
-            modelBuilder.Entity<SubOrder>()
-                .HasMany(x => x.SubOrderItems)
-                .WithOne(x => x.SubOrder)
-                .HasForeignKey(x => x.SubOrderId);
-
-            modelBuilder.Entity<SubOrderItem>()
+            modelBuilder.Entity<OrderItem>()
                 .HasKey(x => x.Id);
         }
     }

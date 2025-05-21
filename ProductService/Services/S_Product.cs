@@ -5,6 +5,7 @@ using ProductService.Common;
 using ProductService.Models.Dtos.RequestModels;
 using ProductService.Models.Dtos.ResponseModels;
 using ProductService.Models.Entities;
+using ProductService.SyncDataService;
 using ProductService.Ultils;
 using System.Linq.Expressions;
 
@@ -27,16 +28,20 @@ namespace ProductService.Services
         Task<ResponseData<List<MRes_Product>>> GetListByCategoryId(int categoryId);
 
         Task<ResponseData<List<MRes_ProductRecommend>>> GetListProductStringForRecommend();
+
+        Task<ResponseData<MRes_User>> GetUser(Guid userId);
     }
     public class S_Product : IS_Product
     {
         private readonly ProductDBContext _context;
         private readonly IMapper _mapper;
+        private readonly IS_UserDataClient _s_UserDataClient;
 
-        public S_Product(ProductDBContext context, IMapper mapper)
+        public S_Product(ProductDBContext context, IMapper mapper, IS_UserDataClient s_UserDataClient)
         {
             _context = context;
             _mapper = mapper;
+            _s_UserDataClient = s_UserDataClient;
         }
 
         public async Task<ResponseData<MRes_Product>> Create(MReq_Product request)
@@ -363,6 +368,24 @@ namespace ProductService.Services
                 }
                 res.result = 1;
                 res.data = returnData;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<MRes_User>> GetUser(Guid userId)
+        {
+            var res = new ResponseData<MRes_User>();
+            try
+            {
+                var user = await _s_UserDataClient.GetUserById(userId);
+                res.result = 1;
+                res.data = user;
             }
             catch (Exception ex)
             {
