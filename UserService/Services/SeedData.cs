@@ -40,8 +40,8 @@ namespace UserService.Services
                     Email = faker.Internet.Email(),
                     Password = faker.Internet.Password(),
                     GoogleId = faker.Random.Guid().ToString(),
-                    IsAdmin = faker.Random.Bool(0.2f),       // 20% là admin
-                    IsPremium = faker.Random.Bool(0.3f),     // 30% là premium
+                    IsAdmin = faker.Random.Bool(0.3f),       // 20% là admin
+                    IsPremium = faker.Random.Bool(0.9f),     // 30% là premium
                     LastProductId = faker.Random.Int(0, 100)
                 };
 

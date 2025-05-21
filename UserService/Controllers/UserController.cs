@@ -43,14 +43,14 @@ namespace UserService.Controllers
             if (!ModelState.IsValid)
                 return Ok(new ResponseData<MRes_User>(0, 400, DataAnnotationExtensionMethod.GetErrorMessage(ModelState)));
             var res = await _s_User.SignUp(request);
-            return Ok(res); 
+            return Ok(res);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var res = await _s_User.Delete(id);
-            return Ok(res); 
+            return Ok(res);
         }
 
         [HttpPut("nameAvatarAddress")]
@@ -99,7 +99,7 @@ namespace UserService.Controllers
         public async Task<IActionResult> UpdateUserAddress(MReq_UserAddress request)
         {
             var res = await _s_User.UpdateAddress(request);
-            return Ok(res); 
+            return Ok(res);
         }
 
         [HttpGet("address/{userId}")]
@@ -120,6 +120,13 @@ namespace UserService.Controllers
         public async Task<IActionResult> GetAllUser()
         {
             var res = await _s_User.GetAll();
+            return Ok(res);
+        }
+
+        [HttpGet("shop/{name}")]
+        public async Task<IActionResult> GetShopByName(string name)
+        {
+            var res = await _s_User.SearchByShopName(name);
             return Ok(res);
         }
     }

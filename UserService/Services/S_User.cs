@@ -26,6 +26,7 @@ namespace UserService.Services
         Task<ResponseData<List<MRes_UserAddress>>> GetUserAddress(Guid userId);
         Task<ResponseData<MRes_User>> GetById(Guid userId);
         Task<ResponseData<List<MRes_User>>> GetAll();
+        Task<ResponseData<List<MRes_User>>> SearchByShopName(string name);
 
     }
     public class S_User : IS_User
@@ -440,6 +441,25 @@ namespace UserService.Services
                 res.result = 1;
                 res.data = save;
                 res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<List<MRes_User>>> SearchByShopName(string name)
+        {
+            var res = new ResponseData<List<MRes_User>>();
+            try
+            {
+                var premium = await _context.Users.Where(x => x.IsPremium == true).ToListAsync();
+                var shops = await _context.Users.Where(x => (x.IsPremium == true) && (x.Name.ToLower().Trim().Contains(name.ToLower().Trim()))).ToListAsync();
+                res.result = 1;
+                res.data = _mapper.Map<List<MRes_User>>(shops);
             }
             catch (Exception ex)
             {
