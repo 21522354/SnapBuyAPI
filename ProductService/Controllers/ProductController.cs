@@ -78,5 +78,12 @@ namespace ProductService.Controllers
             var res = await _s_Product.GetUser(userId);
             return Ok(res);
         }
+
+        [HttpGet("filter/{name}/{startPrice}/{endPrice}/{categoryName}/{tag}")]
+        public async Task<IActionResult> GetListByFullParams(string name, decimal? startPrice, decimal? endPrice, string categoryName, string tag)
+        {
+            var res = await _s_Product.GetListByFullParams(name, startPrice, endPrice, categoryName, tag);
+            return Ok(res);
+        }
     }
 }

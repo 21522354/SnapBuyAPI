@@ -30,6 +30,8 @@ namespace ProductService.Services
         Task<ResponseData<List<MRes_ProductRecommend>>> GetListProductStringForRecommend();
 
         Task<ResponseData<MRes_User>> GetUser(Guid userId);
+
+        Task<ResponseData<List<MRes_Product>>> GetListByFullParams(string name, decimal? startPrice, decimal? endPrice, string categoryName, string tag);
     }
     public class S_Product : IS_Product
     {
@@ -186,7 +188,7 @@ namespace ProductService.Services
                 returnData.SellerId = data.SellerId;
                 returnData.Name = data.Name;
                 returnData.Description = data.Description;
-                returnData.BasePrice = data.BasePrice;
+                returnData.BasePrice = Math.Round(data.BasePrice, 2);
                 returnData.Status = data.Status;
                 returnData.CategoryId = data.CategoryId;
                 returnData.Quantity = data.Quantity;
@@ -226,7 +228,7 @@ namespace ProductService.Services
                     SellerId = x.SellerId,
                     Name = x.Name,
                     Description = x.Description,
-                    BasePrice = x.BasePrice,
+                    BasePrice = Math.Round(x.BasePrice, 2),
                     Status = x.Status,
                     CategoryId = x.CategoryId,
                     Quantity = x.Quantity,
@@ -268,7 +270,7 @@ namespace ProductService.Services
                     SellerId = x.SellerId,
                     Name = x.Name,
                     Description = x.Description,
-                    BasePrice = x.BasePrice,
+                    BasePrice = Math.Round(x.BasePrice, 2),
                     Status = x.Status,
                     CategoryId = x.CategoryId,
                     Quantity = x.Quantity,
@@ -310,7 +312,7 @@ namespace ProductService.Services
                     SellerId = x.SellerId,
                     Name = x.Name,
                     Description = x.Description,
-                    BasePrice = x.BasePrice,
+                    BasePrice = Math.Round(x.BasePrice, 2),
                     Status = x.Status,
                     CategoryId = x.CategoryId,
                     Quantity = x.Quantity,
@@ -345,7 +347,7 @@ namespace ProductService.Services
                     var tempString = "";
                     tempString += product.Name;
                     tempString += "_";
-                    tempString += product.BasePrice;
+                    tempString += Math.Round(product.BasePrice, 2);
                     tempString += "_";
 
                     var productTags = product.ProductTags.Select(x => x.Tag.TagName).ToList();
@@ -386,6 +388,68 @@ namespace ProductService.Services
                 var user = await _s_UserDataClient.GetUserById(userId);
                 res.result = 1;
                 res.data = user;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<List<MRes_Product>>> GetListByFullParams(string name, decimal? startPrice, decimal? endPrice, string categoryName, string tag)
+        {
+            var res = new ResponseData<List<MRes_Product>>();
+            try
+            {
+                var query = _context.Products
+                    .Include(x => x.ProductImages)
+                    .Include(x => x.ProductVariants)
+                    .Include(x => x.ProductTags)
+                    .ThenInclude(x => x.Tag).AsNoTracking();
+                if (!name.Equals("null"))
+                {
+                    query = query.Where(x => x.Name.ToLower().Contains(name.ToLower()));
+                }
+                if(startPrice > 0)
+                {
+                    query = query.Where(x => x.BasePrice >= startPrice);
+                }
+                if(endPrice > 0)
+                {
+                    query = query.Where(x => x.BasePrice <= endPrice);
+                }
+                if (!categoryName.Equals("null"))
+                {
+                    query = query.Where(x => x.Category.Name.ToLower().Contains(categoryName));
+                }
+                if (!tag.Equals("null"))
+                {
+                    query = query.Where(x => x.ProductTags.Select(x => x.Tag.TagName.ToLower()).Contains(tag.ToLower()));
+                }
+
+                var data = await query.ToListAsync();
+
+                var returnData = data.Select(x => new MRes_Product
+                {
+                    Id = x.Id,
+                    SellerId = x.SellerId,
+                    Name = x.Name,
+                    Description = x.Description,
+                    BasePrice = Math.Round(x.BasePrice, 2),
+                    Status = x.Status,
+                    CategoryId = x.CategoryId,
+                    Quantity = x.Quantity,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    ProductImages = _mapper.Map<List<MRes_ProductImage>>(x.ProductImages),
+                    ProductVariants = _mapper.Map<List<MRes_ProductVariant>>(x.ProductVariants),
+                    ListTag = x.ProductTags.Select(x => x.Tag.TagName).ToList(),
+                }).ToList();
+
+                res.result = 1;
+                res.data = returnData;
             }
             catch (Exception ex)
             {
