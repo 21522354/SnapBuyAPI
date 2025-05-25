@@ -1,4 +1,5 @@
 
+using CartService.Services;
 using StackExchange.Redis;
 
 namespace CartService
@@ -17,6 +18,10 @@ namespace CartService
             builder.Services.AddSwaggerGen();
             builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
                 ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]));
+
+            builder.Services.AddScoped<IS_Cart, S_Cart>();
+            builder.Services.AddScoped<RedisService>();
+   
 
             var app = builder.Build();
 

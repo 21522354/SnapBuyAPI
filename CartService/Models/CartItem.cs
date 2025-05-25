@@ -8,6 +8,5 @@
         public decimal ProductPrice { get; set; }
         public string ProductNote { get; set; }
         public int Quantity { get; set; }
-        public int MaxStock { get; set; }   
     }
 }
