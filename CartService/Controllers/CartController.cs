@@ -1,10 +1,11 @@
-﻿using CartService.Services;
+﻿using CartService.Models;
+using CartService.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CartService.Controllers
 {
-    [Route("[controller]/[action]")]
+    [Route("api/carts")]
     [ApiController]
     public class CartController : ControllerBase
     {
@@ -16,27 +17,27 @@ namespace CartService.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertProduct(Guid userId, int productId, string productName, string productImageUrl, string productNote, decimal productPrice, int quantity)
+        public async Task<IActionResult> InsertProduct(MReq_Cart request)
         {
-            var res = await _s_Cart.InsertItem(userId, productId, productName, productImageUrl, productNote, productPrice, quantity);
+            var res = await _s_Cart.InsertItem(request);
             return Ok(res);
         }
 
-        [HttpPut]
+        [HttpPut("{userId}/{productId}/{quantity}")]
         public async Task<IActionResult> UpdateQuantity(Guid userId, int productId, int quantity)
         {
             var res = await _s_Cart.UpdateQuantity(userId, productId, quantity);
             return Ok(res);
         }
 
-        [HttpGet]
+        [HttpGet("{userId}")]
         public async Task<IActionResult> GetCartByUserId(Guid userId)
         {
             var res = await _s_Cart.GetCartByUserId(userId);
             return Ok(res);
         }
 
-        [HttpDelete]
+        [HttpDelete("{userId}/{productId}")]
         public async Task<IActionResult> DeleteItem(Guid userId, int productId)
         {
             var res = await _s_Cart.DeleteItem(userId, productId);

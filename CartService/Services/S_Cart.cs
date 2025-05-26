@@ -6,7 +6,7 @@ namespace CartService.Services
 {
     public interface IS_Cart
     {
-        Task<ResponseData<Cart>> InsertItem(Guid userId, int productId, string productName, string productImageUrl, string productNote, decimal productPrice, int quantity);
+        Task<ResponseData<Cart>> InsertItem(MReq_Cart request);
         Task<ResponseData<Cart>> UpdateQuantity(Guid userId, int productId, int quantity);
         Task<ResponseData<Cart>> DeleteItem(Guid userId, int productid);
         Task<ResponseData<Cart>> GetCartByUserId(Guid userId);
@@ -23,30 +23,30 @@ namespace CartService.Services
 
         private string GetCartKey(Guid userId) => $"{RedisPrefix}{userId}";
 
-        public async Task<ResponseData<Cart>> InsertItem(Guid userId, int productId, string productName, string productImageUrl, string productNote, decimal productPrice, int quantity)
+        public async Task<ResponseData<Cart>> InsertItem(MReq_Cart request)
         {
             var res = new ResponseData<Cart>();
             try
             {
-                var key = GetCartKey(userId);
-                var cart = await GetOrCreateCartAsync(userId);
+                var key = GetCartKey(request.UserId);
+                var cart = await GetOrCreateCartAsync(request.UserId);
 
-                var existingItem = cart.Items.FirstOrDefault(x => x.ProductId == productId && x.ProductNote.Equals(productNote));
+                var existingItem = cart.Items.FirstOrDefault(x => x.ProductId == request.ProductId && x.ProductNote.Equals(request.ProductNote));
                 if (existingItem != null)
                 {
-                    existingItem.Quantity += quantity;
-                    existingItem.ProductNote = productNote;
+                    existingItem.Quantity += request.Quantity;
+                    existingItem.ProductNote = request.ProductNote;
                 }
                 else
                 {
                     cart.Items.Add(new CartItem
                     {
-                        ProductId = productId,
-                        ProductName = productName,
-                        ProductImageUrl = productImageUrl,
-                        ProductPrice = productPrice, // Bạn có thể lấy từ DB nếu cần
-                        ProductNote = productNote,
-                        Quantity = quantity
+                        ProductId = request.ProductId,
+                        ProductName = request.ProductName,
+                        ProductImageUrl = request.ProductImageUrl,
+                        ProductPrice = request.ProductPrice, // Bạn có thể lấy từ DB nếu cần
+                        ProductNote = request.ProductNote,
+                        Quantity = request.Quantity
                     });
                 }
 
