@@ -16,6 +16,7 @@ namespace UserService.Models.Entities
         public string GoogleId { get; set; } = string.Empty;
         public bool IsAdmin { get; set; } = false;
         public bool IsPremium { get; set; } = false;
+        public bool IsBanned { get; set; } = false;
         public int LastProductId { get; set; } = 0;
         public ICollection<UserAddresses> UserAddresses { get; set; }
     }

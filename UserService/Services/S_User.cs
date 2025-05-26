@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Azure.Core;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using UserService.Common;
@@ -16,6 +17,8 @@ namespace UserService.Services
         Task<ResponseData<MRes_UserAddress>> CreateAddress(MReq_UserAddress request);
         Task<ResponseData<MRes_UserAddress>> UpdateAddress(MReq_UserAddress request);
         Task<ResponseData<int>> Delete(Guid userId);
+        Task<ResponseData<int>> BanUser(Guid userId);
+        Task<ResponseData<int>> UnBanUser(Guid userId);
         Task<ResponseData<MRes_User>> UpdateImageNameAddress(MReq_UserNameImageAddress request);
         Task<ResponseData<MRes_User>> UpdatePassword(MReq_UserPassword request);
         Task<ResponseData<int>> GoPremium(Guid userId);
@@ -460,6 +463,70 @@ namespace UserService.Services
                 var shops = await _context.Users.Where(x => (x.IsPremium == true) && (x.Name.ToLower().Trim().Contains(name.ToLower().Trim()))).ToListAsync();
                 res.result = 1;
                 res.data = _mapper.Map<List<MRes_User>>(shops);
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<int>> BanUser(Guid userId)
+        {
+            var res = new ResponseData<int>();
+            try
+            {
+                var data = await _context.Users.FindAsync(userId);
+                if(data == null)
+                {
+                    res.error.message = MessageErrorConstants.DO_NOT_FIND_DATA;
+                    return res;
+                }
+                data.IsBanned = true;
+                var save = await _context.SaveChangesAsync();
+                if(save == 0)
+                {
+                    res.error.code = 400;
+                    res.error.message = MessageErrorConstants.EXCEPTION_DO_NOT_UPDATE;
+                    return res;
+                }
+                res.result = 1;
+                res.data = save;
+                res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<int>> UnBanUser(Guid userId)
+        {
+            var res = new ResponseData<int>();
+            try
+            {
+                var data = await _context.Users.FindAsync(userId);
+                if (data == null)
+                {
+                    res.error.message = MessageErrorConstants.DO_NOT_FIND_DATA;
+                    return res;
+                }
+                data.IsBanned = false;
+                var save = await _context.SaveChangesAsync();
+                if (save == 0)
+                {
+                    res.error.code = 400;
+                    res.error.message = MessageErrorConstants.EXCEPTION_DO_NOT_UPDATE;
+                    return res;
+                }
+                res.result = 1;
+                res.data = save;
+                res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
             }
             catch (Exception ex)
             {

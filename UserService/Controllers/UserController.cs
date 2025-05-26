@@ -88,6 +88,20 @@ namespace UserService.Controllers
             return Ok(res);
         }
 
+        [HttpPut("banUser/{userId}")]
+        public async Task<IActionResult> BanUser(Guid userId)
+        {
+            var res = await _s_User.BanUser(userId);
+            return Ok(res);
+        }
+
+        [HttpPut("unBanUser/{userId}")]
+        public async Task<IActionResult> UnBanUser(Guid userId)
+        {
+            var res = await _s_User.UnBanUser(userId);
+            return Ok(res);
+        }
+
         [HttpPost("address")]
         public async Task<IActionResult> CreateAddress(MReq_UserAddress request)
         {
