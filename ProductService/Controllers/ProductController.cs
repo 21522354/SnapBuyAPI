@@ -23,10 +23,24 @@ namespace ProductService.Controllers
             return Ok(res);
         }
 
+        [HttpPost("detail")]
+        public async Task<IActionResult> CreateWithDetail(MReq_ProductDetail request)
+        {
+            var res = await _s_Product.CreateWithDetail(request);
+            return Ok(res);
+        }
+
         [HttpPut]
         public async Task<IActionResult> Update(MReq_Product request)
         {
             var res = await _s_Product.Update(request);
+            return Ok(res);
+        }
+
+        [HttpPut("approve/{productId}")]
+        public async Task<IActionResult> ApproveProduct(int productId)
+        {
+            var res = await _s_Product.ApproveProduct(productId);
             return Ok(res);
         }
 
@@ -51,6 +65,20 @@ namespace ProductService.Controllers
             return Ok(res);
         }
 
+        [HttpGet("unAccept")]
+        public async Task<IActionResult> GetListOfUnAcceptProduct()
+        {
+            var res = await _s_Product.GetListUnAcceptedProduct();
+            return Ok(res);
+        }
+
+        [HttpGet("accept")]
+        public async Task<IActionResult> GetListAcceptProduct()
+        {
+            var res = await _s_Product.GetListAcceptProduct();
+            return Ok(res);
+        }
+
         [HttpGet("seller/{sellerId}")]
         public async Task<IActionResult> GetListBySellerId(Guid sellerId)
         {
@@ -69,13 +97,6 @@ namespace ProductService.Controllers
         public async Task<IActionResult> GetListProductStringForRecommend()
         {
             var res = await _s_Product.GetListProductStringForRecommend();
-            return Ok(res);
-        }
-
-        [HttpGet("user")]
-        public async Task<IActionResult> GetUserById(Guid userId)
-        {
-            var res = await _s_Product.GetUser(userId);
             return Ok(res);
         }
 

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using ProductService.Common;
@@ -15,7 +16,11 @@ namespace ProductService.Services
     {
         Task<ResponseData<MRes_Product>> Create(MReq_Product request);
 
+        Task<ResponseData<MRes_Product>> CreateWithDetail(MReq_ProductDetail request);
+
         Task<ResponseData<MRes_Product>> Update(MReq_Product request);
+
+        Task<ResponseData<MRes_Product>> ApproveProduct(int productId);
 
         Task<ResponseData<int>> Delete(int id);
 
@@ -23,13 +28,15 @@ namespace ProductService.Services
 
         Task<ResponseData<List<MRes_Product>>> GetList();
 
+        Task<ResponseData<List<MRes_Product>>> GetListUnAcceptedProduct();
+
         Task<ResponseData<List<MRes_Product>>> GetListBySellerId(Guid sellerId);
 
         Task<ResponseData<List<MRes_Product>>> GetListByCategoryId(int categoryId);
 
-        Task<ResponseData<List<MRes_ProductRecommend>>> GetListProductStringForRecommend();
+        Task<ResponseData<List<MRes_Product>>> GetListAcceptProduct();
 
-        Task<ResponseData<MRes_User>> GetUser(Guid userId);
+        Task<ResponseData<List<MRes_ProductRecommend>>> GetListProductStringForRecommend();
 
         Task<ResponseData<List<MRes_Product>>> GetListByFullParams(string name, decimal? startPrice, decimal? endPrice, string categoryName, string tag);
     }
@@ -91,6 +98,107 @@ namespace ProductService.Services
             return res;
         }
 
+        public async Task<ResponseData<MRes_Product>> CreateWithDetail(MReq_ProductDetail request)
+        {
+            var res = new ResponseData<MRes_Product>();
+            try
+            {
+                var existCategory = await _context.Categories.AnyAsync(x => x.Id == request.CategoryId);
+                if (!existCategory)
+                {
+                    res.error.message = "Không tồn tại category được chọn trong hệ thống";
+                    return res;
+                }
+
+                var data = new Product();
+                data.Id = await _context.Products.OrderByDescending(x => x.Id).Select(x => x.Id).FirstOrDefaultAsync() + 1;
+                data.SellerId = request.SellerId;
+                data.Name = request.Name;
+                data.Description = request.Description;
+                data.BasePrice = request.BasePrice;
+                data.Status = request.Status;
+                data.CategoryId = request.CategoryId;
+                data.Quantity = request.Quantity;
+                data.Status = 0;
+                data.CreatedAt = DateTime.Now;
+
+                _context.Products.Add(data);
+
+                var productImages = request.ProductImages.Select(x => new ProductImage
+                {
+                    ProductId = data.Id,
+                    Url = x,
+                    CreatedAt = DateTime.Now
+                }).ToList();
+
+                _context.ProductImages.AddRange(productImages);
+
+                var productVariants = request.ProductVariants.Select(x => new ProductVariant
+                {
+                    ProductId = data.Id,
+                    Color = x.Color,
+                    Status = 1,
+                    Price = x.Price,
+                    Size = x.Size,
+                    CreatedAt = DateTime.Now
+                }).ToList();
+
+                _context.ProductVariants.AddRange(productVariants);
+
+                foreach (var tag in request.Tags)
+                {
+                    var existTag = await _context.Tags.FirstOrDefaultAsync(x => x.TagName.ToLower().Trim().Equals(tag.ToLower().Trim()));
+                    if(existTag == null)
+                    {
+                        var newTag = new Tag
+                        {
+                            TagName = tag,
+                            CreatedAt = DateTime.Now,
+                            Description = "none"
+                        };
+                         _context.Tags.Add(newTag);
+                        await _context.SaveChangesAsync();
+
+                        var productTag = new ProductTag
+                        {
+                            ProductId = data.Id,
+                            TagId = newTag.Id
+                        };
+                        _context.ProductTags.Add(productTag);
+                    }
+                    else
+                    {
+                        var productTag = new ProductTag
+                        {
+                            ProductId = data.Id,
+                            TagId = existTag.Id,
+                        };
+                        _context.ProductTags.Add(productTag);
+                    }
+                }
+
+                var save = await _context.SaveChangesAsync();
+                if (save == 0)
+                {
+                    res.error.code = 400;
+                    res.error.message = MessageErrorConstants.EXCEPTION_DO_NOT_CREATE;
+                    return res;
+                }
+
+                var getById = await GetById(data.Id);
+                res.result = 1;
+                res.data = getById.data;
+                res.error.message = MessageErrorConstants.CREATE_SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
         public async Task<ResponseData<MRes_Product>> Update(MReq_Product request)
         {
             var res = new ResponseData<MRes_Product>();
@@ -123,6 +231,31 @@ namespace ProductService.Services
                 var getById = await GetById(data.Id);
                 res.result = 1;
                 res.data = getById.data;
+                res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<MRes_Product>> ApproveProduct(int productId)
+        {
+            var res = new ResponseData<MRes_Product>();
+            try
+            {
+                var data = await _context.Products.FindAsync(productId);
+                if(data == null)
+                {
+                    res.error.message = MessageErrorConstants.DO_NOT_FIND_DATA;
+                    return res;
+                }
+                data.Status = 1;
+                await _context.SaveChangesAsync();
+                res.result = 1;
                 res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
             }
             catch (Exception ex)
@@ -261,7 +394,7 @@ namespace ProductService.Services
                     .Include(x => x.ProductVariants)
                     .Include(x => x.ProductTags)
                     .ThenInclude(x => x.Tag)
-                    .Where(x => x.SellerId == sellerId)
+                    .Where(x => x.SellerId == sellerId && x.Status == 1)
                     .AsNoTracking().ToListAsync();
 
                 var returnData = data.Select(x => new MRes_Product
@@ -303,7 +436,7 @@ namespace ProductService.Services
                     .Include(x => x.ProductVariants)
                     .Include(x => x.ProductTags)
                     .ThenInclude(x => x.Tag)
-                    .Where(x => x.CategoryId == categoryId)
+                    .Where(x => x.CategoryId == categoryId && x.Status == 1)
                     .AsNoTracking().ToListAsync();
 
                 var returnData = data.Select(x => new MRes_Product
@@ -340,7 +473,7 @@ namespace ProductService.Services
             var res = new ResponseData<List<MRes_ProductRecommend>>();
             try
             {
-                var products = await _context.Products.Include(x => x.ProductTags).ThenInclude(x => x.Tag).AsNoTracking().ToListAsync();
+                var products = await _context.Products.Where(x => x.Status == 1).Include(x => x.ProductTags).ThenInclude(x => x.Tag).AsNoTracking().ToListAsync();
                 var returnData = new List<MRes_ProductRecommend>();
                 foreach (var product in products)
                 {
@@ -380,30 +513,13 @@ namespace ProductService.Services
             return res;
         }
 
-        public async Task<ResponseData<MRes_User>> GetUser(Guid userId)
-        {
-            var res = new ResponseData<MRes_User>();
-            try
-            {
-                var user = await _s_UserDataClient.GetUserById(userId);
-                res.result = 1;
-                res.data = user;
-            }
-            catch (Exception ex)
-            {
-                res.result = -1;
-                res.error.code = 500;
-                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
-            }
-            return res;
-        }
-
         public async Task<ResponseData<List<MRes_Product>>> GetListByFullParams(string name, decimal? startPrice, decimal? endPrice, string categoryName, string tag)
         {
             var res = new ResponseData<List<MRes_Product>>();
             try
             {
                 var query = _context.Products
+                    .Where(x => x.Status == 1)
                     .Include(x => x.ProductImages)
                     .Include(x => x.ProductVariants)
                     .Include(x => x.ProductTags)
@@ -430,6 +546,90 @@ namespace ProductService.Services
                 }
 
                 var data = await query.ToListAsync();
+
+                var returnData = data.Select(x => new MRes_Product
+                {
+                    Id = x.Id,
+                    SellerId = x.SellerId,
+                    Name = x.Name,
+                    Description = x.Description,
+                    BasePrice = Math.Round(x.BasePrice, 2),
+                    Status = x.Status,
+                    CategoryId = x.CategoryId,
+                    Quantity = x.Quantity,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    ProductImages = _mapper.Map<List<MRes_ProductImage>>(x.ProductImages),
+                    ProductVariants = _mapper.Map<List<MRes_ProductVariant>>(x.ProductVariants),
+                    ListTag = x.ProductTags.Select(x => x.Tag.TagName).ToList(),
+                }).ToList();
+
+                res.result = 1;
+                res.data = returnData;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<List<MRes_Product>>> GetListUnAcceptedProduct()
+        {
+            var res = new ResponseData<List<MRes_Product>>();
+            try
+            {
+                var data = await _context.Products
+                    .Where(x => x.Status == 0)
+                    .Include(x => x.ProductImages)
+                    .Include(x => x.ProductVariants)
+                    .Include(x => x.ProductTags)
+                    .ThenInclude(x => x.Tag)
+                    .AsNoTracking().ToListAsync();
+
+                var returnData = data.Select(x => new MRes_Product
+                {
+                    Id = x.Id,
+                    SellerId = x.SellerId,
+                    Name = x.Name,
+                    Description = x.Description,
+                    BasePrice = Math.Round(x.BasePrice, 2),
+                    Status = x.Status,
+                    CategoryId = x.CategoryId,
+                    Quantity = x.Quantity,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    ProductImages = _mapper.Map<List<MRes_ProductImage>>(x.ProductImages),
+                    ProductVariants = _mapper.Map<List<MRes_ProductVariant>>(x.ProductVariants),
+                    ListTag = x.ProductTags.Select(x => x.Tag.TagName).ToList(),
+                }).ToList();
+
+                res.result = 1;
+                res.data = returnData;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<List<MRes_Product>>> GetListAcceptProduct()
+        {
+            var res = new ResponseData<List<MRes_Product>>();
+            try
+            {
+                var data = await _context.Products
+                    .Where(x => x.Status == 1)
+                    .Include(x => x.ProductImages)
+                    .Include(x => x.ProductVariants)
+                    .Include(x => x.ProductTags)
+                    .ThenInclude(x => x.Tag)
+                    .AsNoTracking().ToListAsync();
 
                 var returnData = data.Select(x => new MRes_Product
                 {

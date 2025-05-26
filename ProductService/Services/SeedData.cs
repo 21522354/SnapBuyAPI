@@ -45,9 +45,18 @@ namespace ProductService.Services
             context.Tags.AddRange(tags);
             context.SaveChanges();
 
+            var userIds = new[]
+            {
+                Guid.Parse("5624994f-3a1a-4fa0-83ec-529ec3530f91"),
+                Guid.Parse("5624994f-3a1a-4fa0-83ec-529ec3530f92"),
+                Guid.Parse("5624994f-3a1a-4fa0-83ec-529ec3530f93"),
+                Guid.Parse("5624994f-3a1a-4fa0-83ec-529ec3530f94"),
+                Guid.Parse("5624994f-3a1a-4fa0-83ec-529ec3530f95"),
+            };
+
             // ===== Products =====
             var products = new Faker<Product>()
-                .RuleFor(p => p.SellerId, f => f.Random.Guid())
+                .RuleFor(p => p.SellerId, f => userIds[f.Random.Int(0, 4)])
                 .RuleFor(p => p.Name, f => f.Commerce.ProductName())
                 .RuleFor(p => p.Description, f => f.Lorem.Paragraph())
                 .RuleFor(p => p.BasePrice, f => f.Random.Decimal(10, 500))
@@ -56,6 +65,7 @@ namespace ProductService.Services
                 .RuleFor(p => p.Quantity, f => f.Random.Int(1, 100))
                 .RuleFor(p => p.CreatedAt, f => f.Date.Past())
                 .RuleFor(p => p.UpdatedAt, f => f.Date.Recent())
+                .RuleFor(p => p.Status, f => f.Random.Int(0, 1))
                 .Generate(100);
 
             context.Products.AddRange(products);
