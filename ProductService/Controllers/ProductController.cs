@@ -30,6 +30,13 @@ namespace ProductService.Controllers
             return Ok(res);
         }
 
+        [HttpPut("detail")]
+        public async Task<IActionResult> UpdateWithDetail(MReq_ProductDetail request)
+        {
+            var res = await _s_Product.UpdateWithDetail(request);
+            return Ok(res);
+        }
+
         [HttpPut]
         public async Task<IActionResult> Update(MReq_Product request)
         {

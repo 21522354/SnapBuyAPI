@@ -18,6 +18,8 @@ namespace ProductService.Services
 
         Task<ResponseData<MRes_Product>> CreateWithDetail(MReq_ProductDetail request);
 
+        Task<ResponseData<MRes_Product>> UpdateWithDetail(MReq_ProductDetail request);
+
         Task<ResponseData<MRes_Product>> Update(MReq_Product request);
 
         Task<ResponseData<MRes_Product>> ApproveProduct(int productId);
@@ -189,6 +191,118 @@ namespace ProductService.Services
                 res.result = 1;
                 res.data = getById.data;
                 res.error.message = MessageErrorConstants.CREATE_SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<MRes_Product>> UpdateWithDetail(MReq_ProductDetail request)
+        {
+            var res = new ResponseData<MRes_Product>();
+            try
+            {
+                var existCategory = await _context.Categories.AnyAsync(x => x.Id == request.CategoryId);
+                if (!existCategory)
+                {
+                    res.error.message = "Không tồn tại category được chọn trong hệ thống";
+                    return res;
+                }
+
+                var data = await _context.Products.FindAsync(request.Id);
+                if(data == null)
+                {
+                    res.error.message = MessageErrorConstants.DO_NOT_FIND_DATA;
+                    return res;
+                }
+                data.SellerId = request.SellerId;
+                data.Name = request.Name;
+                data.Description = request.Description;
+                data.BasePrice = request.BasePrice;
+                data.Status = request.Status;
+                data.CategoryId = request.CategoryId;
+                data.Quantity = request.Quantity;
+                data.Status = 0;
+                data.UpdatedAt = DateTime.Now;
+
+                _context.Products.Update(data);
+
+                var oldProductImages = await _context.ProductImages.Where(x => x.ProductId == data.Id).ToListAsync();
+                _context.ProductImages.RemoveRange(oldProductImages);
+                var oldProductVariants = await _context.ProductVariants.Where(x => x.ProductId == data.Id).ToListAsync();
+                _context.ProductVariants.RemoveRange(oldProductVariants);
+                var oldProductTag = await _context.ProductTags.Where(x => x.ProductId == data.Id).ToListAsync();
+                _context.ProductTags.RemoveRange(oldProductTag);
+
+                var productImages = request.ProductImages.Select(x => new ProductImage
+                {
+                    ProductId = data.Id,
+                    Url = x,
+                    CreatedAt = DateTime.Now
+                }).ToList();
+
+                _context.ProductImages.AddRange(productImages);
+
+                var productVariants = request.ProductVariants.Select(x => new ProductVariant
+                {
+                    ProductId = data.Id,
+                    Color = x.Color,
+                    Status = 1,
+                    Price = x.Price,
+                    Size = x.Size,
+                    CreatedAt = DateTime.Now
+                }).ToList();
+
+                _context.ProductVariants.AddRange(productVariants);
+
+                foreach (var tag in request.Tags)
+                {
+                    var existTag = await _context.Tags.FirstOrDefaultAsync(x => x.TagName.ToLower().Trim().Equals(tag.ToLower().Trim()));
+                    if (existTag == null)
+                    {
+                        var newTag = new Tag
+                        {
+                            TagName = tag,
+                            CreatedAt = DateTime.Now,
+                            Description = "none"
+                        };
+                        _context.Tags.Add(newTag);
+                        await _context.SaveChangesAsync();
+
+                        var productTag = new ProductTag
+                        {
+                            ProductId = data.Id,
+                            TagId = newTag.Id
+                        };
+                        _context.ProductTags.Add(productTag);
+                    }
+                    else
+                    {
+                        var productTag = new ProductTag
+                        {
+                            ProductId = data.Id,
+                            TagId = existTag.Id,
+                        };
+                        _context.ProductTags.Add(productTag);
+                    }
+                }
+
+                var save = await _context.SaveChangesAsync();
+                if (save == 0)
+                {
+                    res.error.code = 400;
+                    res.error.message = MessageErrorConstants.EXCEPTION_DO_NOT_UPDATE;
+                    return res;
+                }
+
+                var getById = await GetById(data.Id);
+                res.result = 1;
+                res.data = getById.data;
+                res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
             }
             catch (Exception ex)
             {
