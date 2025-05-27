@@ -1,14 +1,14 @@
-﻿namespace OrderService.Models.Entities
+﻿using OrderService.Models.Entities;
+
+namespace OrderService.Models.Dtos.RequestModels
 {
-    public class Order
+    public class MReq_Order
     {
         public string Id { get; set; }
         public Guid BuyerId { get; set; }
         public Guid SellerId { get; set; }
         public decimal TotalAmount { get; set; }
         public string ShippingAddress { get; set; }
-        public string Status { get; set; }
-        public DateTime CreatedAt { get; set; } 
-        public ICollection<OrderItem> OrderItems { get; set; }
+        public List<MReq_OrderItem> OrderItems { get; set; }
     }
 }

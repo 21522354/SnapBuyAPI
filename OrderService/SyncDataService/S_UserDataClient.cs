@@ -1,4 +1,6 @@
-﻿using OrderService.Models.Dtos.ResponseModels;
+﻿using Newtonsoft.Json;
+using OrderService.Common;
+using OrderService.Models.Dtos.ResponseModels;
 
 namespace OrderService.SyncDataService
 {
@@ -16,9 +18,25 @@ namespace OrderService.SyncDataService
             _httpClient = httpClient;
             _configuration = configuration;
         }
-        public Task<MRes_User> GetUserById(Guid id)
+        public async Task<MRes_User> GetUserById(Guid id)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.GetAsync($"{_configuration["UserServiceEndpoint"]}/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Cannot fetch user. Status: {response.StatusCode}");
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            var apiResponse = JsonConvert.DeserializeObject<ResponseData<MRes_User>>(content);
+
+            if (apiResponse == null || apiResponse.data == null)
+            {
+                throw new Exception("Invalid response structure or data is null.");
+            }
+
+            return apiResponse.data;
         }
     }
 }
