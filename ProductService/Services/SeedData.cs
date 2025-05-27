@@ -101,7 +101,7 @@ namespace ProductService.Services
                 productVariants.AddRange(new Faker<ProductVariant>()
                     .RuleFor(v => v.ProductId, product.Id)
                     .RuleFor(v => v.Size, f => f.PickRandom(new[] { "S", "M", "L", "XL" }))
-                    .RuleFor(v => v.Color, f => f.Commerce.Color())
+                    .RuleFor(v => v.Color, f => $"#{f.Random.Int(0, 0xFFFFFF):X6}")
                     .RuleFor(v => v.Price, f => f.Random.Decimal(10, 500))
                     .RuleFor(v => v.Status, f => f.Random.Int(0, 2))
                     .RuleFor(v => v.CreatedAt, f => f.Date.Past())
