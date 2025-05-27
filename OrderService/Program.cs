@@ -24,6 +24,7 @@ namespace OrderService
                 options.UseInMemoryDatabase("InMem");
             });
             builder.Services.AddHttpClient<IS_UserDataClient, S_UserDataClient>();
+            builder.Services.AddHttpClient<IS_ProductDataClient, S_ProductDataClient>();
             builder.Services.AddScoped<IS_Order, S_Order>();
 
             var app = builder.Build();

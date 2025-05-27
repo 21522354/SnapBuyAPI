@@ -19,6 +19,10 @@ namespace OrderService.Service
 
         Task<ResponseData<MRes_Order>> GetOrderById(string id);
 
+        Task<ResponseData<MRes_SellerStats>> GetSellersStats(Guid sellerId);
+
+        Task<ResponseData<MRes_BuyerStats>> GetBuyerStats(Guid buyerId);
+
         Task<ResponseData<List<MRes_Order>>> GetListOrderByStatus(string status);
 
         Task<ResponseData<List<MRes_Order>>> GetListOrderForSeller(Guid sellerId);
@@ -29,12 +33,14 @@ namespace OrderService.Service
     {
         private readonly OrderDBContext _context;
         private readonly IS_UserDataClient _s_UserDataClient;
+        private readonly IS_ProductDataClient _s_ProductDataClient;
         private readonly IMapper _mapper;
 
-        public S_Order(OrderDBContext context, IS_UserDataClient s_UserDataClient, IMapper mapper)
+        public S_Order(OrderDBContext context, IS_UserDataClient s_UserDataClient, IS_ProductDataClient s_ProductDataClient, IMapper mapper)
         {
             _context = context;
             _s_UserDataClient = s_UserDataClient;
+            _s_ProductDataClient = s_ProductDataClient;
             _mapper = mapper;
         }
 
@@ -284,6 +290,56 @@ namespace OrderService.Service
 
             string newCode = $"{prefix}-{today}-{newNumber.ToString("D4")}";
             return newCode;
+        }
+
+        public async Task<ResponseData<MRes_SellerStats>> GetSellersStats(Guid sellerId)
+        {
+            var res = new ResponseData<MRes_SellerStats>();
+            try
+            {
+                var data = new MRes_SellerStats();
+                var products = await _s_ProductDataClient.GetProductBySeller(sellerId);
+                var orders = await _context.Orders.Where(x => x.SellerId == sellerId).ToListAsync();
+                data.ProductCount = products.Count;
+                data.TotalPurchases = orders.Count;
+                data.TotalRevenue = _context.Orders.Where(x => x.Status == "Paid").Sum(x => x.TotalAmount);
+
+                res.result = 1;
+                res.data = data;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<MRes_BuyerStats>> GetBuyerStats(Guid buyerId)
+        {
+            var res = new ResponseData<MRes_BuyerStats>();
+            try
+            {
+                var data = new MRes_BuyerStats();
+                var totalOrder = await _context.Orders.Where(x => x.BuyerId == buyerId).ToListAsync();
+                var totalOrderIds = totalOrder.Select(x => x.Id);
+                var purchaseCount = await _context.SubOrderItems.Where(x => totalOrderIds.Contains(x.OrderId)).ToListAsync();
+                data.PurchaseCount = purchaseCount.Count;
+                data.TotalSpent = totalOrder.Sum(x => x.TotalAmount);
+                data.TotalOrders = totalOrder.Count;
+
+                res.result = 1;
+                res.data = data;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+
         }
     }
 }

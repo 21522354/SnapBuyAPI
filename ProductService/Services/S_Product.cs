@@ -34,6 +34,8 @@ namespace ProductService.Services
 
         Task<ResponseData<List<MRes_Product>>> GetListBySellerId(Guid sellerId);
 
+        Task<ResponseData<List<MRes_Product>>> GetListAllBySellerId(Guid sellerId);
+
         Task<ResponseData<List<MRes_Product>>> GetListByCategoryId(int categoryId);
 
         Task<ResponseData<List<MRes_Product>>> GetListAcceptProduct();
@@ -226,7 +228,7 @@ namespace ProductService.Services
                 data.Status = request.Status;
                 data.CategoryId = request.CategoryId;
                 data.Quantity = request.Quantity;
-                data.Status = 0;
+                data.Status = request.Status;
                 data.UpdatedAt = DateTime.Now;
 
                 _context.Products.Update(data);
@@ -743,6 +745,48 @@ namespace ProductService.Services
                     .Include(x => x.ProductVariants)
                     .Include(x => x.ProductTags)
                     .ThenInclude(x => x.Tag)
+                    .AsNoTracking().ToListAsync();
+
+                var returnData = data.Select(x => new MRes_Product
+                {
+                    Id = x.Id,
+                    SellerId = x.SellerId,
+                    Name = x.Name,
+                    Description = x.Description,
+                    BasePrice = Math.Round(x.BasePrice, 2),
+                    Status = x.Status,
+                    CategoryId = x.CategoryId,
+                    Quantity = x.Quantity,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    ProductImages = _mapper.Map<List<MRes_ProductImage>>(x.ProductImages),
+                    ProductVariants = _mapper.Map<List<MRes_ProductVariant>>(x.ProductVariants),
+                    ListTag = x.ProductTags.Select(x => x.Tag.TagName).ToList(),
+                }).ToList();
+
+                res.result = 1;
+                res.data = returnData;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<List<MRes_Product>>> GetListAllBySellerId(Guid sellerId)
+        {
+            var res = new ResponseData<List<MRes_Product>>();
+            try
+            {
+                var data = await _context.Products
+                    .Include(x => x.ProductImages)
+                    .Include(x => x.ProductVariants)
+                    .Include(x => x.ProductTags)
+                    .ThenInclude(x => x.Tag)
+                    .Where(x => x.SellerId == sellerId)
                     .AsNoTracking().ToListAsync();
 
                 var returnData = data.Select(x => new MRes_Product

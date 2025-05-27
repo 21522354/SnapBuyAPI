@@ -93,6 +93,13 @@ namespace ProductService.Controllers
             return Ok(res);
         }
 
+        [HttpGet("seller/all/{sellerId}")]
+        public async Task<IActionResult> GetListAllBySellerId(Guid sellerId)
+        {
+            var res = await _s_Product.GetListAllBySellerId(sellerId);
+            return Ok(res);
+        }
+
         [HttpGet("category/{categoryId}")]
         public async Task<IActionResult> GetListByCategoryId(int categoryId)
         {

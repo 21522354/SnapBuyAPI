@@ -64,5 +64,19 @@ namespace OrderService.Controllers
             var res = await _s_Order.GetListOrderForSeller(sellerId);
             return Ok(res);
         }
+
+        [HttpGet("buyer/stats/{buyerId}")]
+        public async Task<IActionResult> GetBuyerStats(Guid buyerId)
+        {
+            var res = await _s_Order.GetBuyerStats(buyerId);
+            return Ok(res);
+        }
+
+        [HttpGet("seller/stats/{buyerId}")]
+        public async Task<IActionResult> GetSellerStats(Guid sellerId)
+        {
+            var res = await _s_Order.GetSellersStats(sellerId);
+            return Ok(res);
+        }
     }
 }
