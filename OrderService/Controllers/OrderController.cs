@@ -72,7 +72,7 @@ namespace OrderService.Controllers
             return Ok(res);
         }
 
-        [HttpGet("seller/stats/{buyerId}")]
+        [HttpGet("seller/stats/{sellerId}")]
         public async Task<IActionResult> GetSellerStats(Guid sellerId)
         {
             var res = await _s_Order.GetSellersStats(sellerId);
