@@ -36,11 +36,20 @@ namespace ProductService.Services
             context.SaveChanges();
 
             // ===== Tags =====
-            var tags = new Faker<Tag>()
-                .RuleFor(t => t.TagName, f => f.Commerce.ProductAdjective())
-                .RuleFor(t => t.Description, f => f.Lorem.Sentence())
-                .RuleFor(t => t.CreatedAt, f => f.Date.Past())
-                .Generate(20);
+
+            var tagNames = new[]
+            {
+                "Eco-friendly", "Compact", "Durable", "Portable", "Stylish",
+                "Luxury", "Affordable", "Limited", "Smart", "Classic",
+                "Lightweight", "Premium", "Trendy", "Comfortable", "Innovative",
+                "Organic", "Modern", "Handmade", "Efficient", "Custom"
+            };
+            var tags = tagNames.Select(name => new Tag
+            {
+                TagName = name,
+                Description = new Faker().Lorem.Sentence(),
+                CreatedAt = DateTime.UtcNow
+            }).ToList();
 
             context.Tags.AddRange(tags);
             context.SaveChanges();
