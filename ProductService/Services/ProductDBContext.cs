@@ -15,6 +15,8 @@ namespace ProductService.Services
         public DbSet<ProductVariant> ProductVariants { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<ProductTag> ProductTags { get; set; }
+        public DbSet<ProductReview> ProductReviews { get; set; }
+        public DbSet<ProductReviewImage> ProductReviewImages { get; set; }  
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,6 +50,8 @@ namespace ProductService.Services
                 .WithOne(p => p.Product)
                 .HasForeignKey(p => p.ProductId);
 
+
+
             modelBuilder.Entity<ProductTag>()
                 .HasOne(p => p.Product)
                 .WithMany(p => p.ProductTags)
@@ -57,6 +61,19 @@ namespace ProductService.Services
                 .HasOne(p => p.Tag)
                 .WithMany(p => p.ProductTags)
                 .HasForeignKey(p => p.TagId);
+
+            modelBuilder.Entity<ProductReview>()
+                .HasKey(x => x.Id);
+
+            modelBuilder.Entity<ProductReview>()
+                .HasMany(x => x.ProductReviewImages)
+                .WithOne(x => x.ProductReview)
+                .HasForeignKey(x => x.ProductReviewId);
+
+            modelBuilder.Entity<ProductReviewImage>()
+                .HasKey(x => x.Id);
+                
+           
         }
     }
 }

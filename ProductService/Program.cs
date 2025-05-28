@@ -30,6 +30,7 @@ namespace ProductService
             builder.Services.AddScoped<IS_ProductVariant, S_ProductVariant>();
             builder.Services.AddScoped<IS_Tag, S_Tag>();
             builder.Services.AddScoped<IS_ProductTag, S_ProductTag>();
+            builder.Services.AddScoped<IS_ProductReview, S_ProductReview>();
 
             builder.Services.AddHttpClient<IS_UserDataClient, S_UserDataClient>();
 
