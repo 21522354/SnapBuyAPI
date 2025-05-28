@@ -97,15 +97,29 @@ namespace ProductService.Services
                     .RuleFor(i => i.CreatedAt, f => f.Date.Past())
                     .Generate(3));
 
-                // 3 variants
-                productVariants.AddRange(new Faker<ProductVariant>()
-                    .RuleFor(v => v.ProductId, product.Id)
-                    .RuleFor(v => v.Size, f => f.PickRandom(new[] { "S", "M", "L", "XL" }))
-                    .RuleFor(v => v.Color, f => $"#{f.Random.Int(0, 0xFFFFFF):X6}")
-                    .RuleFor(v => v.Price, f => f.Random.Decimal(10, 500))
-                    .RuleFor(v => v.Status, f => f.Random.Int(0, 2))
-                    .RuleFor(v => v.CreatedAt, f => f.Date.Past())
-                    .Generate(3));
+                // 4 variants
+                // Lấy 2 màu và 2 size bất kỳ
+                var sizes = new[] { "S", "M", "L", "XL" }.OrderBy(_ => Guid.NewGuid()).Take(2).ToArray();
+                var colors = Enumerable.Range(0, 2)
+                    .Select(_ => $"#{new Random().Next(0x1000000):X6}")
+                    .ToArray();
+
+                // Kết hợp tạo 4 variant (2 size x 2 color)
+                foreach (var size in sizes)
+                {
+                    foreach (var color in colors)
+                    {
+                        productVariants.Add(new ProductVariant
+                        {
+                            ProductId = product.Id,
+                            Size = size,
+                            Color = color,
+                            Price = new Random().Next(10, 500),
+                            Status = new Random().Next(0, 3),
+                            CreatedAt = DateTime.UtcNow.AddDays(-new Random().Next(1, 365))
+                        });
+                    }
+                }
 
                 // 5 tags
                 var selectedTags = tags.OrderBy(_ => rnd.Next()).Take(5).ToList();
