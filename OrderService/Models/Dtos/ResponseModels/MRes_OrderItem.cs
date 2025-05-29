@@ -10,6 +10,7 @@
         public string ProductNote { get; set; }
         public int ProductVariantId { get; set; }
         public int Quantity { get; set; }
+        public bool IsReviewed { get; set; }    
         public decimal UnitPrice { get; set; }
     }
 }

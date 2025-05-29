@@ -11,6 +11,8 @@ namespace OrderService.Service
 
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> SubOrderItems { get; set; }
+        public DbSet<Voucher> Vouchers { get; set; }
+        public DbSet<VoucherUsage> VoucherUsages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

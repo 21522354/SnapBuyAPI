@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using OrderService.Common;
 using OrderService.Models.Dtos.RequestModels;
@@ -17,6 +18,8 @@ namespace OrderService.Service
 
         Task<ResponseData<MRes_Order>> UpdateStatus(string id, string status);
 
+        Task<ResponseData<int>> UpdateProductReviewed(int id);
+
         Task<ResponseData<MRes_Order>> GetOrderById(string id);
 
         Task<ResponseData<MRes_SellerStats>> GetSellersStats(Guid sellerId);
@@ -28,6 +31,8 @@ namespace OrderService.Service
         Task<ResponseData<List<MRes_Order>>> GetListOrderForSeller(Guid sellerId);
 
         Task<ResponseData<List<MRes_Order>>> GetListOrderForBuyer(Guid buyerId);
+
+        Task<ResponseData<List<MRes_OrderItem>>> GetListUnReviewedProduct(Guid buyerId);
     }
     public class S_Order : IS_Order
     {
@@ -66,6 +71,7 @@ namespace OrderService.Service
                     ProductNote = x.ProductNote,
                     ProductVariantId = x.ProductVariantId,
                     Quantity = x.Quantity,
+                    IsReviewed = false,
                     UnitPrice = x.UnitPrice,
                 }).ToList();
                 _context.SubOrderItems.AddRange(orderItems);
@@ -113,6 +119,37 @@ namespace OrderService.Service
                 var getById = await GetOrderById(id);
                 res.result = 1;
                 res.data = getById.data;
+                res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<int>> UpdateProductReviewed(int id)
+        {
+            var res = new ResponseData<int>();
+            try
+            {
+                var productItem = await _context.SubOrderItems.FindAsync(id);
+                if(productItem == null)
+                {
+                    res.error.message = MessageErrorConstants.DO_NOT_FIND_DATA;
+                    return res;
+                }
+                productItem.IsReviewed = true;
+                var save = await _context.SaveChangesAsync();
+                if(save == 0)
+                {
+                    res.error.message = MessageErrorConstants.EXCEPTION_DO_NOT_UPDATE;
+                    res.error.code = 400;
+                }
+                res.result = 1;
+                res.data = save;
                 res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
             }
             catch (Exception ex)
@@ -261,8 +298,6 @@ namespace OrderService.Service
             }
             return res;
         }
-
-
         public async Task<string> GenerateOrderCodeAsync()
         {
             string today = DateTime.UtcNow.ToString("yyyyMMdd");
@@ -340,6 +375,26 @@ namespace OrderService.Service
             }
             return res;
 
+        }
+
+        public async Task<ResponseData<List<MRes_OrderItem>>> GetListUnReviewedProduct(Guid buyerId)
+        {
+            var res = new ResponseData<List<MRes_OrderItem>>();
+            try
+            {
+                var data = await _context.SubOrderItems
+                    .Include(x => x.Order)
+                    .Where(x => x.Order.BuyerId == buyerId && x.IsReviewed == false).ToListAsync();
+                res.result = 1;
+                res.data = _mapper.Map<List<MRes_OrderItem>>(data);
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
         }
     }
 }

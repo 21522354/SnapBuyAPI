@@ -78,5 +78,19 @@ namespace OrderService.Controllers
             var res = await _s_Order.GetSellersStats(sellerId);
             return Ok(res);
         }
+
+        [HttpPut("orderItems/{id}")]
+        public async Task<IActionResult> UpdateProductReviewed(int id)
+        {
+            var res = await _s_Order.UpdateProductReviewed(id);
+            return Ok(res);
+        }
+
+        [HttpGet("orderItems/unReviewed/{buyerId}")]
+        public async Task<IActionResult> GetListProductUnReviewed(Guid buyerId)
+        {
+            var res = await _s_Order.GetListUnReviewedProduct(buyerId);
+            return Ok(res);
+        }
     }
 }
