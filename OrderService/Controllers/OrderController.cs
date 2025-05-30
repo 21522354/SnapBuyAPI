@@ -92,5 +92,12 @@ namespace OrderService.Controllers
             var res = await _s_Order.GetListUnReviewedProduct(buyerId);
             return Ok(res);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetALl()
+        {
+            var res = await _s_Order.GetAllOrder();
+            return Ok(res);
+        }
     }
 }

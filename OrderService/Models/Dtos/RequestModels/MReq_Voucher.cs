@@ -16,7 +16,6 @@ namespace OrderService.Models.Dtos.RequestModels
         public decimal Value { get; set; }
         public decimal? MinOrderValue { get; set; }
         public DateTime? ExpiryDate { get; set; }
-        public bool IsDisabled { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

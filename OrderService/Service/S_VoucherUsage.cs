@@ -30,6 +30,13 @@ namespace OrderService.Service
             {
                 var data = new VoucherUsage();
                 _mapper.Map(request, data);
+                var voucher = await _context.Vouchers.FirstOrDefaultAsync(x => x.Code.ToLower().Trim().Equals(request.Code.ToLower().Trim()));
+                if (voucher == null)
+                {
+                    res.error.message = "Voucher code is not exist";
+                    return res;
+                }
+                data.VoucherId = voucher.Id;
                 data.UsedAt = DateTime.Now;
                 _context.VoucherUsages.Add(data);
                 var save = await _context.SaveChangesAsync();

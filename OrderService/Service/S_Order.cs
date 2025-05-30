@@ -33,6 +33,8 @@ namespace OrderService.Service
         Task<ResponseData<List<MRes_Order>>> GetListOrderForBuyer(Guid buyerId);
 
         Task<ResponseData<List<MRes_OrderItem>>> GetListUnReviewedProduct(Guid buyerId);
+
+        Task<ResponseData<List<MRes_Order>>> GetAllOrder();
     }
     public class S_Order : IS_Order
     {
@@ -61,20 +63,6 @@ namespace OrderService.Service
                 data.CreatedAt = DateTime.Now;
 
                 _context.Orders.Add(data);
-
-                var orderItems = request.OrderItems.Select(x => new OrderItem
-                {
-                    OrderId = data.Id,
-                    ProductId = x.ProductId,
-                    ProductImageUrl = x.ProductImageUrl,
-                    ProductName = x.ProductName,
-                    ProductNote = x.ProductNote,
-                    ProductVariantId = x.ProductVariantId,
-                    Quantity = x.Quantity,
-                    IsReviewed = false,
-                    UnitPrice = x.UnitPrice,
-                }).ToList();
-                _context.SubOrderItems.AddRange(orderItems);
 
                 var save = await _context.SaveChangesAsync();
                 if(save == 0)
@@ -359,6 +347,24 @@ namespace OrderService.Service
                     .Where(x => x.Order.BuyerId == buyerId && x.Order.Status == "Success" && x.IsReviewed == false).ToListAsync();
                 res.result = 1;
                 res.data = _mapper.Map<List<MRes_OrderItem>>(data);
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<List<MRes_Order>>> GetAllOrder()
+        {
+            var res = new ResponseData<List<MRes_Order>>();
+            try
+            {
+                var data = await _context.Orders.AsNoTracking().ToListAsync();
+                res.result = 1;
+                res.data = _mapper.Map<List<MRes_Order>>(data);
             }
             catch (Exception ex)
             {

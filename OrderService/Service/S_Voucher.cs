@@ -171,7 +171,8 @@ namespace OrderService.Service
             {
                 var data = await _context.Vouchers
                     .Include(x => x.VoucherUsages)
-                    .Where(x => x.ExpiryDate >= DateTime.Now && !x.VoucherUsages.Any(x => x.UserId == userId)).ToListAsync();
+                    .Where(x => x.ExpiryDate >= DateTime.Now && !x.VoucherUsages.Any(x => x.UserId == userId))
+                    .ToListAsync();
                 var returnData = _mapper.Map<List<MRes_Voucher>>(data);
                 foreach (var item in returnData)
                 {
