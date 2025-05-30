@@ -298,34 +298,6 @@ namespace OrderService.Service
             }
             return res;
         }
-        public async Task<string> GenerateOrderCodeAsync()
-        {
-            string today = DateTime.UtcNow.ToString("yyyyMMdd");
-            string prefix = "ORD";
-
-            // Lấy danh sách các mã order trong ngày hôm nay
-            var todayOrders = await _context.Orders
-                .Where(o => o.CreatedAt.Date == DateTime.UtcNow.Date)
-                .OrderByDescending(o => o.Id)
-                .Select(o => o.Id)
-                .ToListAsync();
-
-            int newNumber = 1;
-
-            if (todayOrders.Any())
-            {
-                // Tìm số thứ tự cuối cùng
-                var lastCode = todayOrders.First(); // Đã sắp xếp giảm dần rồi
-                var parts = lastCode.Split('-');
-                if (parts.Length == 3 && int.TryParse(parts[2], out int lastNumber))
-                {
-                    newNumber = lastNumber + 1;
-                }
-            }
-
-            string newCode = $"{prefix}-{today}-{newNumber.ToString("D4")}";
-            return newCode;
-        }
 
         public async Task<ResponseData<MRes_SellerStats>> GetSellersStats(Guid sellerId)
         {
@@ -384,7 +356,7 @@ namespace OrderService.Service
             {
                 var data = await _context.SubOrderItems
                     .Include(x => x.Order)
-                    .Where(x => x.Order.BuyerId == buyerId && x.IsReviewed == false).ToListAsync();
+                    .Where(x => x.Order.BuyerId == buyerId && x.Order.Status == "Success" && x.IsReviewed == false).ToListAsync();
                 res.result = 1;
                 res.data = _mapper.Map<List<MRes_OrderItem>>(data);
             }
@@ -396,6 +368,34 @@ namespace OrderService.Service
             }
             return res;
         }
+
+        public async Task<string> GenerateOrderCodeAsync()
+        {
+            string today = DateTime.UtcNow.ToString("yyyyMMdd");
+            string prefix = "ORD";
+
+            // Lấy danh sách các mã order trong ngày hôm nay
+            var todayOrders = await _context.Orders
+                .Where(o => o.CreatedAt.Date == DateTime.UtcNow.Date)
+                .OrderByDescending(o => o.Id)
+                .Select(o => o.Id)
+                .ToListAsync();
+
+            int newNumber = 1;
+
+            if (todayOrders.Any())
+            {
+                // Tìm số thứ tự cuối cùng
+                var lastCode = todayOrders.First(); // Đã sắp xếp giảm dần rồi
+                var parts = lastCode.Split('-');
+                if (parts.Length == 3 && int.TryParse(parts[2], out int lastNumber))
+                {
+                    newNumber = lastNumber + 1;
+                }
+            }
+
+            string newCode = $"{prefix}-{today}-{newNumber.ToString("D4")}";
+            return newCode;
+        }
     }
 }
-

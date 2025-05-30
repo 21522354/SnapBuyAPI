@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace OrderService.Models.Entities
+namespace OrderService.Models.Dtos.RequestModels
 {
-    public class Voucher
+    public class MReq_Voucher
     {
-        [Key]
-        public int Id { get; set; }     
 
+        public int Id { get; set; } 
         [Required, MaxLength(50)]
         public string Code { get; set; }
 
@@ -15,12 +14,9 @@ namespace OrderService.Models.Entities
 
         [Required]
         public decimal Value { get; set; }
-
         public decimal? MinOrderValue { get; set; }
-
         public DateTime? ExpiryDate { get; set; }
-
+        public bool IsDisabled { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public ICollection<VoucherUsage> VoucherUsages { get; set; }        
     }
 }
