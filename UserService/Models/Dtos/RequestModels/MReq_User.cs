@@ -17,6 +17,7 @@ namespace UserService.Models.Dtos.RequestModels
         public int Id { get; set; }     
         [Required]
         public Guid UserId { get; set; }
-        public string Address { get; set; }     
+        public string Address { get; set; }
+        public string PhoneNumber { get; set; } 
     }
 }

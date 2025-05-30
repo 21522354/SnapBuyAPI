@@ -58,6 +58,7 @@ namespace UserService.Services
                     .RuleFor(a => a.Id, _ => addressId++)
                     .RuleFor(a => a.UserId, _ => userId)
                     .RuleFor(a => a.Address, f => f.Address.FullAddress())
+                    .RuleFor(a => a.PhoneNumber, f => f.Phone.PhoneNumber())
                     .Generate(2));
 
                 index++;
