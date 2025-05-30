@@ -21,6 +21,6 @@ namespace OrderService.Models.Entities
         public DateTime? ExpiryDate { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public ICollection<VoucherUsage> VoucherUsages { get; set; }        
+        public ICollection<VoucherUsage> VoucherUsages { get; set; }
     }
 }

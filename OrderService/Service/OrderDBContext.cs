@@ -28,6 +28,12 @@ namespace OrderService.Service
 
             modelBuilder.Entity<OrderItem>()
                 .HasKey(x => x.Id);
+
+            modelBuilder.Entity<Order>()
+                .HasMany(x => x.VoucherUsages)
+                .WithOne(x => x.Order)
+                .HasForeignKey(x => x.OrderId);
+                
         }
     }
 }

@@ -26,6 +26,8 @@ namespace OrderService
             builder.Services.AddHttpClient<IS_UserDataClient, S_UserDataClient>();
             builder.Services.AddHttpClient<IS_ProductDataClient, S_ProductDataClient>();
             builder.Services.AddScoped<IS_Order, S_Order>();
+            builder.Services.AddScoped<IS_Voucher, S_Voucher>();
+            builder.Services.AddScoped<IS_VoucherUsage, S_VoucherUsage>();
 
             var app = builder.Build();
 

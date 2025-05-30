@@ -10,5 +10,6 @@
         public string Status { get; set; }
         public DateTime CreatedAt { get; set; } 
         public ICollection<OrderItem> OrderItems { get; set; }
+        public ICollection<VoucherUsage> VoucherUsages { get; set; }        
     }
 }

@@ -15,6 +15,9 @@ namespace OrderService.Mapper
             CreateMap<OrderItem, MReq_OrderItem>().ReverseMap();
             CreateMap<Voucher, MReq_Voucher>().ReverseMap();
             CreateMap<Voucher, MRes_Voucher>().ReverseMap();
+
+            CreateMap<VoucherUsage, MReq_VoucherUsage>().ReverseMap();
+            CreateMap<VoucherUsage, MRes_VoucherUsage>().ReverseMap();
         }
     }
 }

@@ -14,7 +14,7 @@ namespace OrderService.Service
         Task<ResponseData<MRes_Voucher>> Update(MReq_Voucher request);
         Task<ResponseData<int>> Delete(int id);
         Task<ResponseData<MRes_Voucher>> GetVoucherById(int id);
-        Task<ResponseData<List<MRes_Voucher>>> GetALlVoucher();
+        Task<ResponseData<List<MRes_Voucher>>> GetAllVoucher();
         Task<ResponseData<List<MRes_Voucher>>> GetAvailableVoucherForUser(Guid userId, decimal orderTotal);
     }
     public class S_Voucher : IS_Voucher
@@ -146,7 +146,7 @@ namespace OrderService.Service
             return res;
         }
 
-        public async Task<ResponseData<List<MRes_Voucher>>> GetALlVoucher()
+        public async Task<ResponseData<List<MRes_Voucher>>> GetAllVoucher()
         {
             var res = new ResponseData<List<MRes_Voucher>>();
             try
