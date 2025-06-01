@@ -17,10 +17,10 @@ namespace ChatService.Service
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<ChatRoom>()
-                .HasKey(x => x.ChatRoomId);
+                .HasKey(x => x.Id);
 
             modelBuilder.Entity<ChatMessage>()
-                .HasKey(x => x.ChatMessageId);
+                .HasKey(x => x.Id);
 
             modelBuilder.Entity<ChatRoom>()
                 .HasMany(x => x.ChatMessages)

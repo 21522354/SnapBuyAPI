@@ -25,10 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="Mapper\" />
-    <Folder Include="Models\Dtos\ResponseModel\" />
-    <Folder Include="SyncDataService\" />
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 {
     public class ChatMessage
     {
-        public int ChatMessageId { get; set; }
+        public int Id { get; set; }
         public int ChatRoomId { get; set; }
         public virtual ChatRoom ChatRoom { get; set; }
         public Guid UserSendId { get; set; }
