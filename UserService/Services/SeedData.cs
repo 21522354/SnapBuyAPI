@@ -47,6 +47,7 @@ namespace UserService.Services
                     Email = faker.Internet.Email(),
                     Password = faker.Internet.Password(),
                     GoogleId = faker.Random.Guid().ToString(),
+                    SELLER_MERCHANT_ID = "gdasjlgkgasggsd",
                     IsAdmin = faker.Random.Bool(0.3f),        // admin vẫn random
                     IsPremium = index < 5,                    // 5 user đầu tiên là premium
                     LastProductId = faker.Random.Int(0, 100)

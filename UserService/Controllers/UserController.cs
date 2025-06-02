@@ -53,6 +53,13 @@ namespace UserService.Controllers
             return Ok(res);
         }
 
+        [HttpPut("updateMerchantId")]
+        public async Task<IActionResult> UpdateMerchantId(MReq_UserMerchant request)
+        {
+            var res = await _s_User.SetUserMerchantId(request);
+            return Ok(res);
+        }
+
         [HttpPut("nameAvatarAddress")]
         public async Task<IActionResult> UpdateImageAndName(MReq_UserNameImageAddress request)
         {

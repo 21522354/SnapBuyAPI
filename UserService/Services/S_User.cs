@@ -16,6 +16,7 @@ namespace UserService.Services
         Task<ResponseData<MRes_User>> SignUp(MReq_User request);
         Task<ResponseData<MRes_UserAddress>> CreateAddress(MReq_UserAddress request);
         Task<ResponseData<MRes_UserAddress>> UpdateAddress(MReq_UserAddress request);
+        Task<ResponseData<MRes_User>> SetUserMerchantId(MReq_UserMerchant request);
         Task<ResponseData<int>> Delete(Guid userId);
         Task<ResponseData<int>> BanUser(Guid userId);
         Task<ResponseData<int>> UnBanUser(Guid userId);
@@ -148,6 +149,37 @@ namespace UserService.Services
                     return res;
                 }
                 data.Password = request.Password;
+                var save = await _context.SaveChangesAsync();
+                if (save == 0)
+                {
+                    res.error.code = 400;
+                    res.error.message = MessageErrorConstants.EXCEPTION_DO_NOT_UPDATE;
+                    return res;
+                }
+                res.data = _mapper.Map<MRes_User>(data);
+                res.result = 1;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+        }
+
+        public async Task<ResponseData<MRes_User>> SetUserMerchantId(MReq_UserMerchant request)
+        {
+            var res = new ResponseData<MRes_User>();
+            try
+            {
+                var data = await _context.Users.FindAsync(request.Id);
+                if (data == null)
+                {
+                    res.error.message = MessageErrorConstants.DO_NOT_FIND_DATA;
+                    return res;
+                }
+                data.SELLER_MERCHANT_ID = request.SELLER_MERCHANT_ID;
                 var save = await _context.SaveChangesAsync();
                 if (save == 0)
                 {
@@ -536,5 +568,6 @@ namespace UserService.Services
             }
             return res;
         }
+
     }
 }
