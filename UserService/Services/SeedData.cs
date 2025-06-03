@@ -47,11 +47,16 @@ namespace UserService.Services
                     Email = faker.Internet.Email(),
                     Password = "123",
                     GoogleId = faker.Random.Guid().ToString(),
-                    SELLER_MERCHANT_ID = "gdasjlgkgasggsd",
+                    SELLER_MERCHANT_ID = "",
                     IsAdmin = faker.Random.Bool(0.3f),        // admin vẫn random
                     IsPremium = index < 5,                    // 5 user đầu tiên là premium
                     LastProductId = faker.Random.Int(0, 100)
                 };
+
+                if(index == 2 || index == 4)
+                {
+                    user.SELLER_MERCHANT_ID = "MERCHANT_ID_123442122";
+                }
 
                 users.Add(user);
 
