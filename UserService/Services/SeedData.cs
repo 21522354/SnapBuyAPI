@@ -45,7 +45,7 @@ namespace UserService.Services
                     ImageURL = faker.Internet.Avatar(),
                     UserName = faker.Internet.UserName(),
                     Email = faker.Internet.Email(),
-                    Password = faker.Internet.Password(),
+                    Password = "123",
                     GoogleId = faker.Random.Guid().ToString(),
                     SELLER_MERCHANT_ID = "gdasjlgkgasggsd",
                     IsAdmin = faker.Random.Bool(0.3f),        // admin vẫn random
