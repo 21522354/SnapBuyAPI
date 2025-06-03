@@ -1,4 +1,9 @@
 
+using Microsoft.EntityFrameworkCore;
+using NotificationService.AsyncDataService;
+using NotificationService.EventProcessing;
+using NotificationService.Services;
+
 namespace NotificationService
 {
     public class Program
@@ -13,6 +18,18 @@ namespace NotificationService
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSignalR();
+            builder.Services.AddDbContext<NotificationDBContext>(options =>
+            {
+                options.UseInMemoryDatabase("InMem");
+            });
+
+            builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
+            builder.Services.AddScoped<IS_Notification, S_Notification>();
+            builder.Services.AddHostedService<MessageBusSubscriber>();
+
+            Console.WriteLine($"{builder.Configuration["RabbitMQHost"]}/{builder.Configuration["RabbitMQPort"]}");
 
             var app = builder.Build();
 
