@@ -99,5 +99,12 @@ namespace OrderService.Controllers
             var res = await _s_Order.GetAllOrder();
             return Ok(res);
         }
+
+        [HttpGet("seller/revenue/{sellerId}/{type}")]
+        public async Task<IActionResult> GetSellerRevenue(Guid sellerId, int type)
+        {
+            var res = await _s_Order.GetSellerRevenue(sellerId, type);
+            return Ok(res);
+        }
     }
 }

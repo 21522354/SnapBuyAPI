@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using OrderService.Common;
 using OrderService.Models.Dtos.RequestModels;
 using OrderService.Models.Dtos.ResponseModels;
@@ -35,6 +36,8 @@ namespace OrderService.Service
         Task<ResponseData<List<MRes_OrderItem>>> GetListUnReviewedProduct(Guid buyerId);
 
         Task<ResponseData<List<MRes_Order>>> GetAllOrder();
+
+        Task<ResponseData<MRes_SellerRevenue>> GetSellerRevenue(Guid sellerId, int type);
     }
     public class S_Order : IS_Order
     {
@@ -402,6 +405,63 @@ namespace OrderService.Service
 
             string newCode = $"{prefix}-{today}-{newNumber.ToString("D4")}";
             return newCode;
+        }
+
+        public async Task<ResponseData<MRes_SellerRevenue>> GetSellerRevenue(Guid sellerId, int type)
+        {
+            var res = new ResponseData<MRes_SellerRevenue>();
+            try
+            {
+                var orders = await _context.Orders.Include(x => x.OrderItems).Where(x => x.SellerId == sellerId && (x.Status == "Success" || x.Status == "Approved")).ToListAsync();
+                var now = DateTime.Now;
+
+                if (type == 1)
+                {
+                    // Tuần hiện tại
+                    var startOfWeek = now.Date.AddDays(-(int)now.DayOfWeek + (int)DayOfWeek.Monday);
+                    var endOfWeek = startOfWeek.AddDays(7);
+
+                    orders = orders.Where(x => x.CreatedAt >= startOfWeek && x.CreatedAt < endOfWeek).ToList();
+                }
+                else if (type == 2)
+                {
+                    // Tháng hiện tại
+                    var startOfMonth = new DateTime(now.Year, now.Month, 1);
+                    var startOfNextMonth = startOfMonth.AddMonths(1);
+
+                    orders = orders.Where(x => x.CreatedAt >= startOfMonth && x.CreatedAt < startOfNextMonth).ToList();
+                }
+                else if (type == 3)
+                {
+                    // Năm hiện tại
+                    var startOfYear = new DateTime(now.Year, 1, 1);
+                    var startOfNextYear = startOfYear.AddYears(1);
+
+                    orders = orders.Where(x => x.CreatedAt >= startOfYear && x.CreatedAt < startOfNextYear).ToList();
+                }
+
+                int totalOrders = orders.Count;
+                int itemSold = orders.Sum(x => x.OrderItems.Count);
+                decimal totalRevenue = orders.Sum(x => x.TotalAmount);
+
+                var returnData = new MRes_SellerRevenue
+                {
+                    TotalOrder = totalOrders,
+                    ItemSold = itemSold,
+                    Revenue = totalRevenue
+                };
+
+                res.result = 1;
+                res.data = returnData;
+            }
+            catch (Exception ex)
+            {
+                res.result = -1;
+                res.error.code = 500;
+                res.error.message = $"Exception: {ex.Message}\r\n{ex.InnerException?.Message}";
+            }
+            return res;
+
         }
     }
 }

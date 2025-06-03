@@ -14,4 +14,11 @@ namespace OrderService.Models.Dtos.ResponseModels
         public MRes_User Buyer { get; set; }
         public MRes_User Seller { get; set; }
     }
+
+    public class MRes_SellerRevenue
+    {
+        public int TotalOrder { get; set; }
+        public int ItemSold { get; set; }
+        public decimal Revenue { get; set; }  
+    }
 }
