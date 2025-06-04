@@ -9,6 +9,7 @@ namespace OrderService.Models.Dtos.ResponseModels
         public Guid SellerId { get; set; }
         public decimal TotalAmount { get; set; }
         public string ShippingAddress { get; set; }
+        public string PhoneNumber { get; set; } 
         public string Status { get; set; }
         public List<MRes_OrderItem> OrderItems { get; set; }
         public MRes_User Buyer { get; set; }

@@ -9,6 +9,7 @@ namespace OrderService.Models.Dtos.RequestModels
         public Guid SellerId { get; set; }
         public decimal TotalAmount { get; set; }
         public string ShippingAddress { get; set; }
+        public string PhoneNumber { get; set; } 
         public List<MReq_OrderItem> OrderItems { get; set; }
     }
 }

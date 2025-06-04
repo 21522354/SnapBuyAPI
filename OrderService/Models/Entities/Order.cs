@@ -7,6 +7,7 @@
         public Guid SellerId { get; set; }
         public decimal TotalAmount { get; set; }
         public string ShippingAddress { get; set; }
+        public string PhoneNumber { get; set; } 
         public string Status { get; set; }
         public DateTime CreatedAt { get; set; } 
         public ICollection<OrderItem> OrderItems { get; set; }
