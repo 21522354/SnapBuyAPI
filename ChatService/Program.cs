@@ -29,6 +29,29 @@ namespace ChatService
                 options.EnableDetailedErrors = true;
             });
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.WithOrigins("http://localhost:5216",
+                        "http://localhost:5216",
+                        "http://192.168.1.1",
+                        "http://192.168.1.2",
+                        "http://192.168.1.3",
+                        "http://192.168.1.4",
+                        "http://192.168.1.5",
+                        "http://192.168.1.6",
+                        "http://192.168.1.7",
+                        "http://192.168.1.8",
+                        "http://192.168.1.9",
+                        "http://192.168.1.10"
+                        ) 
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials(); 
+                });
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -41,10 +64,10 @@ namespace ChatService
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
+            app.UseCors("AllowSpecificOrigins");
 
             app.MapControllers();
-            app.MapHub<ChatHub>("/chatHub");
+            app.MapHub<ChatHub>("/chatHub").RequireCors("AllowAll");
 
             app.Run();
         }
