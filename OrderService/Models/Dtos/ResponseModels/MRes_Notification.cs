@@ -1,8 +1,7 @@
-﻿namespace NotificationService.Models.Dtos.Response
+﻿namespace OrderService.Models.Dtos.ResponseModels
 {
     public class MRes_Notification
     {
-        public int Id { get; set; }
         public Guid UserId { get; set; }
         public Guid UserInvoke { get; set; }
         public string Message { get; set; }

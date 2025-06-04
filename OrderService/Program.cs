@@ -1,5 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
+using OrderService.AsyncDataService;
 using OrderService.Mapper;
 using OrderService.Service;
 using OrderService.SyncDataService;
@@ -28,6 +29,7 @@ namespace OrderService
             builder.Services.AddScoped<IS_Order, S_Order>();
             builder.Services.AddScoped<IS_Voucher, S_Voucher>();
             builder.Services.AddScoped<IS_VoucherUsage, S_VoucherUsage>();
+            builder.Services.AddScoped<IMessageBusClient, MessageBusClient>();
 
             var app = builder.Build();
 

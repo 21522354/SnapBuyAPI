@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using OrderService.AsyncDataService;
 using OrderService.Common;
 using OrderService.Models.Dtos.RequestModels;
 using OrderService.Models.Dtos.ResponseModels;
@@ -44,13 +45,15 @@ namespace OrderService.Service
         private readonly OrderDBContext _context;
         private readonly IS_UserDataClient _s_UserDataClient;
         private readonly IS_ProductDataClient _s_ProductDataClient;
+        private readonly IMessageBusClient _messageBusClient;
         private readonly IMapper _mapper;
 
-        public S_Order(OrderDBContext context, IS_UserDataClient s_UserDataClient, IS_ProductDataClient s_ProductDataClient, IMapper mapper)
+        public S_Order(OrderDBContext context, IS_UserDataClient s_UserDataClient, IS_ProductDataClient s_ProductDataClient, IMapper mapper, IMessageBusClient messageBusClient)
         {
             _context = context;
             _s_UserDataClient = s_UserDataClient;
             _s_ProductDataClient = s_ProductDataClient;
+            _messageBusClient = messageBusClient;
             _mapper = mapper;
         }
 
@@ -74,7 +77,19 @@ namespace OrderService.Service
                     res.error.code = 400;
                     return res;
                 }
+
                 var getById = await GetOrderById(data.Id);
+
+                await _messageBusClient.PublishNewNotification(new MRes_Notification
+                {
+                    UserId = data.SellerId,
+                    UserInvoke = data.BuyerId,
+                    EventType = "NewOrder",
+                    IsAlreadySeen = false,
+                    Message = getById.data.Buyer.UserName + "has placed a new order",
+                    OrderId = getById.data.Id
+                });
+
                 res.result = 1;
                 res.data = getById.data;
                 res.error.message = MessageErrorConstants.CREATE_SUCCESS;

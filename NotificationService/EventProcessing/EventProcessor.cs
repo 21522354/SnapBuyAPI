@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using NotificationService.Hubs;
 using NotificationService.Models.Dtos.Request;
+using NotificationService.Models.Entities;
+using NotificationService.Services;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace NotificationService.EventProcessing
 {
@@ -60,9 +63,34 @@ namespace NotificationService.EventProcessing
             throw new NotImplementedException();
         }
 
-        private void NewOrderEvent(string message)
+        private async Task NewOrderEvent(string message)
         {
-            throw new NotImplementedException();
+            using(var scope = _serviceScopeFactory.CreateScope())
+            {
+                var _context = scope.ServiceProvider.GetRequiredService<NotificationDBContext>();
+                var notiDto = JsonSerializer.Deserialize<MReq_Notification>(message);
+                try
+                {
+                    var noti = new Notification
+                    {
+                        UserId = notiDto.UserId,
+                        UserInvoke = notiDto.UserInvoke,
+                        Message = notiDto.Message,
+                        OrderId = notiDto.OrderId,
+                        ProductId = notiDto.ProductId,
+                        EventType = notiDto.EventType,
+                        IsAlreadySeen = false
+                    };
+                    _context.Notifications.Add(noti);
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"--> Could not add Notification to DB {ex.Message}");
+                }
+                Console.WriteLine(message);
+            }
+            
         }
 
         private EventType DetermineEvent(string notificationMessage)
