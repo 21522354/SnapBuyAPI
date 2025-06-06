@@ -58,6 +58,7 @@ namespace UserService.Services
                 newUser.ID = Guid.NewGuid();
                 newUser.ImageURL = "https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg";
                 newUser.Name = "Default Name";
+                newUser.LastProductId = 1;
                 _context.Users.Add(newUser);
                 var save = await _context.SaveChangesAsync();
                 if (save == 0)
@@ -390,7 +391,7 @@ namespace UserService.Services
                     GoogleId = request.GoogleId,
                     ImageURL = "https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg",
                     Name = "Default Name",
-    
+                    LastProductId = 1
                 };
                 _context.Users.Add(newUser);
                 var save = await _context.SaveChangesAsync();

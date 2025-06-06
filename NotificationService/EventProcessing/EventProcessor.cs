@@ -26,114 +26,45 @@ namespace NotificationService.EventProcessing
                 case EventType.NewOrder:
                     await NewOrderEvent(message);
                     break;
-                case EventType.ApproveOrder:
-                    await ApproveOrderEvent(message);
-                    break;
-                case EventType.CancelOrder:
-                    await CancelOrderEvent(message);
-                    break;
-                case EventType.SuccessOrder:
-                    await SuccessOrderEvent(message);
-                    break;
-                case EventType.NewRatingProduct:
-                    await NewRatingProductEvent(message);
+                case EventType.ChangeStatus:
+                    await ChangeStatusEvent(message);
                     break;
                 default:
                     break;
             }
         }
 
+        private async Task ChangeStatusEvent(string message)
+        {
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var _context = scope.ServiceProvider.GetRequiredService<NotificationDBContext>();
+                var notiDto = JsonSerializer.Deserialize<MReq_Notification>(message);
+                try
+                {
+                    var noti = new Notification
+                    {
+                        UserId = notiDto.UserId,
+                        UserInvoke = notiDto.UserInvoke,
+                        Message = notiDto.Message,
+                        OrderId = notiDto.OrderId,
+                        ProductId = notiDto.ProductId,
+                        EventType = notiDto.EventType,
+                        IsAlreadySeen = false
+                    };
+                    _context.Notifications.Add(noti);
+                    await _context.SaveChangesAsync();
+                    await _hubContext.Clients.All.SendAsync("NewNoti", noti.UserId.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"--> Could not add Notification to DB {ex.Message}");
+                }
+                Console.WriteLine(message);
+            }
+        }
+
         private async Task NewRatingProductEvent(string message)
-        {
-            using (var scope = _serviceScopeFactory.CreateScope())
-            {
-                var _context = scope.ServiceProvider.GetRequiredService<NotificationDBContext>();
-                var notiDto = JsonSerializer.Deserialize<MReq_Notification>(message);
-                try
-                {
-                    var noti = new Notification
-                    {
-                        UserId = notiDto.UserId,
-                        UserInvoke = notiDto.UserInvoke,
-                        Message = notiDto.Message,
-                        OrderId = notiDto.OrderId,
-                        ProductId = notiDto.ProductId,
-                        EventType = notiDto.EventType,
-                        IsAlreadySeen = false
-                    };
-                    _context.Notifications.Add(noti);
-                    await _context.SaveChangesAsync();
-                    await _hubContext.Clients.All.SendAsync("NewNoti", noti.UserId.ToString());
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"--> Could not add Notification to DB {ex.Message}");
-                }
-                Console.WriteLine(message);
-            }
-        }
-
-        private async Task SuccessOrderEvent(string message)
-        {
-            using (var scope = _serviceScopeFactory.CreateScope())
-            {
-                var _context = scope.ServiceProvider.GetRequiredService<NotificationDBContext>();
-                var notiDto = JsonSerializer.Deserialize<MReq_Notification>(message);
-                try
-                {
-                    var noti = new Notification
-                    {
-                        UserId = notiDto.UserId,
-                        UserInvoke = notiDto.UserInvoke,
-                        Message = notiDto.Message,
-                        OrderId = notiDto.OrderId,
-                        ProductId = notiDto.ProductId,
-                        EventType = notiDto.EventType,
-                        IsAlreadySeen = false
-                    };
-                    _context.Notifications.Add(noti);
-                    await _context.SaveChangesAsync();
-                    await _hubContext.Clients.All.SendAsync("NewNoti", noti.UserId.ToString());
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"--> Could not add Notification to DB {ex.Message}");
-                }
-                Console.WriteLine(message);
-            }
-        }
-
-        private async Task CancelOrderEvent(string message)
-        {
-            using (var scope = _serviceScopeFactory.CreateScope())
-            {
-                var _context = scope.ServiceProvider.GetRequiredService<NotificationDBContext>();
-                var notiDto = JsonSerializer.Deserialize<MReq_Notification>(message);
-                try
-                {
-                    var noti = new Notification
-                    {
-                        UserId = notiDto.UserId,
-                        UserInvoke = notiDto.UserInvoke,
-                        Message = notiDto.Message,
-                        OrderId = notiDto.OrderId,
-                        ProductId = notiDto.ProductId,
-                        EventType = notiDto.EventType,
-                        IsAlreadySeen = false
-                    };
-                    _context.Notifications.Add(noti);
-                    await _context.SaveChangesAsync();
-                    await _hubContext.Clients.All.SendAsync("NewNoti", noti.UserId.ToString());
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"--> Could not add Notification to DB {ex.Message}");
-                }
-                Console.WriteLine(message);
-            }
-        }
-
-        private async Task ApproveOrderEvent(string message)
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
@@ -203,12 +134,8 @@ namespace NotificationService.EventProcessing
             {
                 case "NewOrder":
                     return EventType.NewOrder;
-                case "ApproveOrder":
-                    return EventType.ApproveOrder;
-                case "CancelOrder":
-                    return EventType.CancelOrder;
-                case "SuccessOrder":
-                    return EventType.SuccessOrder;
+                case "ChangeStatus":
+                    return EventType.ChangeStatus;
                 case "NewRatingProduct":
                     return EventType.NewRatingProduct;
                 default:
@@ -220,11 +147,9 @@ namespace NotificationService.EventProcessing
         enum EventType
         {
             NewOrder,
-            ApproveOrder,
-            CancelOrder,
-            SuccessOrder,
+            ChangeStatus,
             NewRatingProduct,
-            Undetermined,
+            Undetermined
         }
     }
 }

@@ -9,6 +9,7 @@ using OrderService.Models.Dtos.ResponseModels;
 using OrderService.Models.Entities;
 using OrderService.SyncDataService;
 using OrderService.Ultils;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OrderService.Service
 {
@@ -123,6 +124,18 @@ namespace OrderService.Service
                     return res;
                 }
                 var getById = await GetOrderById(id);
+
+                await _messageBusClient.PublishNewNotification(new MRes_Notification
+                {
+                    UserId = data.SellerId,
+                    UserInvoke = data.BuyerId,
+                    EventType = "ChangeStatus",
+                    IsAlreadySeen = false,
+                    Message = getById.data.Id + "has been" + status,
+                    OrderId = getById.data.Id
+                });
+
+
                 res.result = 1;
                 res.data = getById.data;
                 res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
@@ -141,7 +154,7 @@ namespace OrderService.Service
             var res = new ResponseData<int>();
             try
             {
-                var productItem = await _context.SubOrderItems.FindAsync(id);
+                var productItem = await _context.SubOrderItems.Include(x => x.Order).FirstOrDefaultAsync(x => x.Id == id);
                 if(productItem == null)
                 {
                     res.error.message = MessageErrorConstants.DO_NOT_FIND_DATA;
@@ -157,6 +170,16 @@ namespace OrderService.Service
                 res.result = 1;
                 res.data = save;
                 res.error.message = MessageErrorConstants.UPDATE_SUCCESS;
+
+                await _messageBusClient.PublishNewNotification(new MRes_Notification
+                {
+                    UserId = productItem.Order.SellerId,
+                    UserInvoke = productItem.Order.BuyerId,
+                    EventType = "NewRatingProduct",
+                    IsAlreadySeen = false,
+                    Message = "New review for your product",
+                    OrderId = productItem.OrderId
+                });
             }
             catch (Exception ex)
             {
