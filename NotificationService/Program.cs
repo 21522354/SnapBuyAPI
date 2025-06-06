@@ -51,13 +51,14 @@ namespace NotificationService
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
-
-            app.MapControllers();
+            app.UseRouting();
 
             app.UseCors("AllowFrontend");
 
-            app.MapHub<NotificationHub>("/notificationHub").RequireCors("AllowAll");
+            app.UseAuthorization();
+
+            app.MapControllers();
+            app.MapHub<NotificationHub>("/notificationHub").RequireCors("AllowFrontend");
 
             app.Run();
         }

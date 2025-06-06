@@ -18,7 +18,7 @@ namespace UserService.Models.Entities
         public bool IsPremium { get; set; } = false;
         public bool IsBanned { get; set; } = false;
         public int LastProductId { get; set; } = 0;
-        public string SELLER_MERCHANT_ID { get; set; }  
+        public string SELLER_MERCHANT_ID { get; set; } = string.Empty;
         public ICollection<UserAddresses> UserAddresses { get; set; }
     }
 }
