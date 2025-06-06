@@ -46,9 +46,9 @@ namespace ChatService
                         "http://192.168.1.9",
                         "http://192.168.1.10"
                         ) 
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials(); 
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials(); 
                 });
             });
 

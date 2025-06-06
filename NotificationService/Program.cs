@@ -32,28 +32,13 @@ namespace NotificationService
 
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", policy =>
-                {
-                    policy.WithOrigins("http://localhost:5216",
-                        "http://localhost:5216",
-                        "http://192.168.1.1",
-                        "http://192.168.1.2",
-                        "http://192.168.1.3",
-                        "http://192.168.1.4",
-                        "http://192.168.1.5",
-                        "http://192.168.1.6",
-                        "http://192.168.1.7",
-                        "http://192.168.1.8",
-                        "http://192.168.1.9",
-                        "http://192.168.1.10"
-                        )
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
-                });
+                options.AddPolicy("AllowFrontend",
+                    builder => builder
+                        .WithOrigins("http://localhost:5216")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials());
             });
-
-            Console.WriteLine($"{builder.Configuration["RabbitMQHost"]}/{builder.Configuration["RabbitMQPort"]}");
 
             var app = builder.Build();
 
@@ -68,9 +53,11 @@ namespace NotificationService
 
             app.UseAuthorization();
 
-            app.MapHub<NotificationHub>("/notificationHub").RequireCors("AllowAll");
-
             app.MapControllers();
+
+            app.UseCors("AllowFrontend");
+
+            app.MapHub<NotificationHub>("/notificationHub").RequireCors("AllowAll");
 
             app.Run();
         }
