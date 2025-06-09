@@ -48,14 +48,19 @@ namespace UserService.Services
                     Password = "123",
                     GoogleId = faker.Random.Guid().ToString(),
                     SELLER_MERCHANT_ID = "",
-                    IsAdmin = faker.Random.Bool(0.3f),        // admin vẫn random
+                    IsAdmin = false,  // admin vẫn random
                     IsPremium = index < 5,                    // 5 user đầu tiên là premium
                     LastProductId = faker.Random.Int(0, 100)
                 };
 
-                if(index == 2 || index == 4)
+                if (index == 2)
                 {
                     user.SELLER_MERCHANT_ID = "MERCHANT_ID_123442122";
+                }
+
+                if (index == 4)
+                {
+                    user.SELLER_MERCHANT_ID = "MERCHANT_ID_123442211";
                 }
 
                 users.Add(user);
@@ -69,6 +74,21 @@ namespace UserService.Services
 
                 index++;
             }
+
+            var admin = new User()
+            {
+                ID = Guid.NewGuid(),
+                Name = "admin",
+                ImageURL = faker.Internet.Avatar(),
+                UserName = "admin",
+                Email = "admin@gmail.com",
+                Password = "admin",
+                GoogleId = faker.Random.Guid().ToString(),
+                SELLER_MERCHANT_ID = "",
+                IsAdmin = true,
+                LastProductId = 10,
+            };
+            context.Users.Add(admin);
 
 
             context.Users.AddRange(users);
