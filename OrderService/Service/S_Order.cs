@@ -131,7 +131,17 @@ namespace OrderService.Service
                     UserInvoke = data.BuyerId,
                     EventType = "ChangeStatus",
                     IsAlreadySeen = false,
-                    Message = getById.data.Id + "has been" + status,
+                    Message = getById.data.Id + " has been " + status,
+                    OrderId = getById.data.Id
+                });
+
+                await _messageBusClient.PublishNewNotification(new MRes_Notification
+                {
+                    UserId = data.BuyerId,
+                    UserInvoke = data.SellerId,
+                    EventType = "ChangeStatus",
+                    IsAlreadySeen = false,
+                    Message = getById.data.Id + " has been " + status,
                     OrderId = getById.data.Id
                 });
 
