@@ -44,7 +44,7 @@ namespace UserService.Services
                     Name = faker.Name.FullName(),
                     ImageURL = faker.Internet.Avatar(),
                     UserName = faker.Internet.UserName(),
-                    Email = faker.Internet.Email(),
+                    Email = "user" + (index + 1).ToString() + "@gmail.com",
                     Password = "123",
                     GoogleId = faker.Random.Guid().ToString(),
                     SELLER_MERCHANT_ID = "",
