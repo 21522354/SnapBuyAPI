@@ -91,6 +91,16 @@ namespace OrderService.Service
                     OrderId = getById.data.Id
                 });
 
+                await _messageBusClient.PublishNewNotification(new MRes_Notification
+                {
+                    UserId = data.BuyerId,
+                    UserInvoke = data.SellerId,
+                    EventType = "NewOrder",
+                    IsAlreadySeen = false,
+                    Message =  "You has placed a new order",
+                    OrderId = getById.data.Id
+                });
+
                 res.result = 1;
                 res.data = getById.data;
                 res.error.message = MessageErrorConstants.CREATE_SUCCESS;
