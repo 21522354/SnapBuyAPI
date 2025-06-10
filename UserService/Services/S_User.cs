@@ -57,7 +57,7 @@ namespace UserService.Services
                 var newUser = _mapper.Map<User>(request);
                 newUser.ID = Guid.NewGuid();
                 newUser.ImageURL = "https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg";
-                newUser.Name = "Default Name";
+                newUser.Name = request.UserName;
                 newUser.LastProductId = 1;
                 _context.Users.Add(newUser);
                 var save = await _context.SaveChangesAsync();
