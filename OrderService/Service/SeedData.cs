@@ -13,6 +13,8 @@ namespace OrderService.Service
             var context = scope.ServiceProvider.GetRequiredService<OrderDBContext>();
             var _productService = scope.ServiceProvider.GetRequiredService<IS_ProductDataClient>();
 
+            #region Seed Order
+
             if (context.Orders.Any()) return;
 
             var faker = new Faker("en");
@@ -88,6 +90,24 @@ namespace OrderService.Service
                     context.Orders.Add(order);
                 }
             }
+
+            #endregion
+
+            #region Seed Voucher
+            if (!context.Vouchers.Any())
+            {
+                var voucherFaker = new Faker<Voucher>("en")
+                    .RuleFor(v => v.Code, f => $"VC{f.Random.AlphaNumeric(8).ToUpper()}") // Mã dạng VCXXXXXX
+                    .RuleFor(v => v.Type, f => f.PickRandom(new[] { "fixed", "percentage" }))
+                    .RuleFor(v => v.Value, f => Math.Round(f.Random.Decimal(20, 100), 2))
+                    .RuleFor(v => v.MinOrderValue, f => f.Random.Int(30, 100))
+                    .RuleFor(v => v.ExpiryDate, f => f.Date.Future(1))
+                    .RuleFor(v => v.CreatedAt, f => DateTime.UtcNow);
+
+                var vouchers = voucherFaker.Generate(20);
+                context.Vouchers.AddRange(vouchers);
+            }
+            #endregion
 
             await context.SaveChangesAsync();
         }

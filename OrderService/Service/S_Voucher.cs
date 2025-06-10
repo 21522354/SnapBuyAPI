@@ -64,7 +64,12 @@ namespace OrderService.Service
             var res = new ResponseData<MRes_Voucher>();
             try
             {
-                var data = new Voucher();
+                var data = await _context.Vouchers.FindAsync(request.Id);
+                if(data == null)
+                {
+                    res.error.message = MessageErrorConstants.DO_NOT_FIND_DATA;
+                    return res;
+                }
                 data.Value = request.Value;
                 data.MinOrderValue = request.MinOrderValue;
                 data.ExpiryDate = request.ExpiryDate;
