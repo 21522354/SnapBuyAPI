@@ -21,7 +21,7 @@ namespace NotificationService.Services
             var res = new ResponseData<List<MRes_Notification>>();
             try
             {
-                var notis = await _context.Notifications.Where(x => x.UserId == userId).ToListAsync();
+                var notis = await _context.Notifications.Where(x => x.UserId == userId).OrderByDescending(x => x.Id).ToListAsync();
                 var returnData = notis.Select(x => new MRes_Notification
                 {
                     Id = x.Id,
