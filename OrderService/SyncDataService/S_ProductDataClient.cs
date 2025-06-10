@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc.ActionConstraints;
+using Newtonsoft.Json;
 using OrderService.Common;
 using OrderService.Models.Dtos.ResponseModels;
 
@@ -7,6 +8,7 @@ namespace OrderService.SyncDataService
     public interface IS_ProductDataClient
     {
         Task<List<MRes_Product>> GetProductBySeller(Guid sellerId);
+        Task<List<MRes_Product2>> GetProductBySeller2(Guid sellerId);
     }
     public class S_ProductDataClient : IS_ProductDataClient
     {
@@ -30,6 +32,27 @@ namespace OrderService.SyncDataService
             var content = await response.Content.ReadAsStringAsync();
 
             var apiResponse = JsonConvert.DeserializeObject<ResponseData<List<MRes_Product>>>(content);
+
+            if (apiResponse == null || apiResponse.data == null)
+            {
+                throw new Exception("Invalid response structure or data is null.");
+            }
+
+            return apiResponse.data;
+        }
+
+        public async Task<List<MRes_Product2>> GetProductBySeller2(Guid sellerId)
+        {
+            var response = await _httpClient.GetAsync($"{_configuration["ProductServiceEndpoint"]}/seller/{sellerId}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Cannot fetch user. Status: {response.StatusCode}");
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            var apiResponse = JsonConvert.DeserializeObject<ResponseData<List<MRes_Product2>>>(content);
 
             if (apiResponse == null || apiResponse.data == null)
             {
